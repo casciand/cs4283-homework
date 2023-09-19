@@ -1,0 +1,25 @@
+// HealthMessage schema
+
+namespace CustomAppProto;
+
+enum DispenserStatus : string { OPTIMAL, PARTIAL, BLOCKAGE }
+
+enum GeneralStatus : string { GOOD, BAD }
+
+struct HealthContents
+{
+    dispenser: DispenserStatus;
+    icemaker: int;
+    lightbulb: GeneralStatus;
+    fridge_temp: int;
+    freezer_temp: int;
+    sensor_status: GeneralStatus;
+}
+
+table Health
+{
+   type: string;
+   contents: HealthContents;
+}
+
+root_type Health;
