@@ -2,9 +2,9 @@
 
 namespace CustomAppProto;
 
-enum DispenserStatus : string { OPTIMAL, PARTIAL, BLOCKAGE }
+enum DispenserStatus : byte { OPTIMAL, PARTIAL, BLOCKAGE }
 
-enum GeneralStatus : string { GOOD, BAD }
+enum GeneralStatus : byte { GOOD, BAD }
 
 struct HealthContents
 {

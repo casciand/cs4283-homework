@@ -1,0 +1,78 @@
+// OrderMessage schema
+
+namespace CustomAppProto;
+
+enum Type : byte { ORDER, HEALTH, RESPONSE }
+
+enum Code : byte { OK, BAD_REQUEST }
+
+enum DispenserStatus : byte { OPTIMAL, PARTIAL, BLOCKAGE }
+
+enum GeneralStatus : byte { GOOD, BAD }
+
+enum MilkType : byte { WHOLE, SKIM }
+
+enum BreadType : byte { WHITE, WHEAT }
+
+enum MeatType : byte { BEEF, CHICKEN, PORK }
+
+struct Veggies
+{
+    tomato: float;
+    cucumber: float;
+}
+
+struct Cans
+{
+    coke: int;
+}
+
+struct Bottles
+{
+    sprite: int;
+}
+
+struct Drinks
+{
+    cans: Cans;
+    bottles: Bottles;
+}
+
+struct Milk
+{
+    type: MilkType;
+    quantity: float;
+}
+
+struct Bread
+{
+    type: BreadType;
+    quantity: float;
+}
+
+struct Meat
+{
+    type: MeatType;
+    quantity: float;
+}
+
+struct OrderContents
+{
+    veggies: Veggies;
+    drinks: Drinks;
+    milk: [Milk];
+    bread: [Bread];
+    meat: [Meat];
+}
+
+table Order
+{
+   type: Type;
+   contents: OrderContents;
+}
+
+// indicate what is the top level structure from where the serialization starts.
+// The reason we need this is because we may have a very complicated nested
+// data structure and so we need to tell the compiler the starting point.
+
+root_type Order;
