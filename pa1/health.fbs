@@ -1,12 +1,14 @@
 // HealthMessage schema
 
-namespace CustomAppProto;
+namespace Messages;
 
+// Enums
 enum DispenserStatus : byte { OPTIMAL, PARTIAL, BLOCKAGE }
 
 enum GeneralStatus : byte { GOOD, BAD }
 
-struct HealthContents
+// Tables
+table HealthContents
 {
     dispenser: DispenserStatus;
     icemaker: int;
@@ -16,10 +18,11 @@ struct HealthContents
     sensor_status: GeneralStatus;
 }
 
-table Health
+table HealthMessage
 {
    type: string;
    contents: HealthContents;
 }
 
-root_type Health;
+// Indicate top level structure from where the serialization begins
+root_type HealthMessage;

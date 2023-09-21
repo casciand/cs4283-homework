@@ -1,16 +1,19 @@
 // ResponseMessage schema
 
-namespace CustomAppProto;
+namespace Messages;
 
+// Enums
 enum Type : byte { ORDER, HEALTH, RESPONSE }
 
 enum Code : byte { OK, BAD_REQUEST }
 
-table Response
+// Tables
+table ResponseMessage
 {
    type: Type;
    code: Code;
    contents: string;
 }
 
-root_type Response;
+// Indicate top level structure from where the serialization begins
+root_type ResponseMessage;

@@ -9,12 +9,7 @@ class DispenserStatus(Enum):
     BLOCKAGE = "BLOCKAGE"
 
 
-class LightbulbStatus(Enum):
-    GOOD = "GOOD"
-    BAD = "BAD"
-
-
-class SensorStatus(Enum):
+class GeneralStatus(Enum):
     GOOD = "GOOD"
     BAD = "BAD"
 
@@ -24,38 +19,92 @@ class ResponseCode(Enum):
     BAD_REQUEST = "BAD_REQUEST"
 
 
-@dataclass
-class HealthContents:
-    """ Native representation of the contents of HEALTH message """
-    dispenser: DispenserStatus = "OPTIMAL"
-    icemaker: int = 90  # efficiency percentage, e.g., 90 for 90%
-    lightbulb: LightbulbStatus = "GOOD"
-    fridge_temp: int = 20
-    freezer_temp: int = -15
-    sensor_status: SensorStatus = "GOOD"
-    # You can add additional fields here, for example:
-    motor_status: str = "RUNNING"  # just an example, can be anything relevant
+class MilkType(Enum):
+    WHOLE = "WHOLE"
+    SKIM = "SKIM"
+
+
+class BreadType(Enum):
+    WHITE = "WHITE"
+    WHEAT = "WHEAT"
+
+
+class MeatType(Enum):
+    CHICKEN = "CHICKEN"
+    BEEF = "BEEF"
+    PORK = "PORK"
 
 
 @dataclass
 class HealthMessage:
+    class HealthContents:
+        dispenser: DispenserStatus = DispenserStatus.OPTIMAL.value
+        icemaker: int = 97  # efficiency percentage, e.g., 90 for 90%
+        lightbulb: GeneralStatus = GeneralStatus.GOOD.value
+        fridge_temp: int = 23
+        freezer_temp: int = -150
+        sensor_status: GeneralStatus = GeneralStatus.BAD.value
+        # You can add additional fields here, for example:
+        motor_status: str = "RUNNING"  # just an example, can be anything relevant
+
+        def dump(self):
+            print("  dispenser: {}".format(self.dispenser))
+            print("  icemaker: {}".format(self.icemaker))
+            print("  lightbulb: {}".format(self.lightbulb))
+            print("  fridge_temp: {}".format(self.fridge_temp))
+            print("  freezer_temp: {}".format(self.freezer_temp))
+            print("  sensor_status: {}".format(self.sensor_status))
+            print("  motor_status: {}".format(self.motor_status))
+
     """ Native representation for HEALTH message """
     contents: HealthContents  # Using the 'Contents' dataclass as an attribute
     type: str = "HEALTH"
 
     def __init__(self):
-        self.contents = HealthContents()
+        self.contents = self.HealthContents()
+
+    def dump(self):
+        print("Type: {}".format(self.type))
+        print("Contents:")
+        self.contents.dump()
 
 
-class OrderContents:
-    veggies: str
-    contents: {}
+class Veggies:
+    tomatoes: float
+    cucumbers: float
 
+class Cans:
+    coke: int
+
+class Bottles:
+    sprite: int
+
+class Drinks:
+    cans: Cans
+    bottles: Bottles
+
+class Milk:
+    type: MilkType
+    quantity: float
+
+class Bread:
+    type: BreadType
+    quantity: float
+
+class Meat:
+    type: MeatType
+    quantity: float
 
 @dataclass
 class OrderMessage:
-    """ Our message in native representation"""
-    contents: {}
+    class OrderContents:
+        veggies: Veggies
+        drinks: Drinks
+        milk: List[Milk]
+        bread: List[Bread]
+        meat: List[Meat]
+
+    contents: OrderContents
     type: str = 'ORDER'
 
 
@@ -66,6 +115,10 @@ class ResponseMessage:
     contents: str  # e.g., "Order Placed", "You are Healthy", "Bad Request"
     type: str = "RESPONSE"
 
+    def dump(self):
+        print("Type: {}".format(self.type))
+        print("Code: {}".format(self.code))
+        print("Contents: {}".format(self.contents))
 
 # Example Usage:
 
