@@ -1,6 +1,6 @@
 from typing import List, Union, Tuple
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, IntEnum
 
 
 class DispenserStatus(Enum):
@@ -73,30 +73,54 @@ class Veggies:
     tomatoes: float
     cucumbers: float
 
+
 class Cans:
     coke: int
 
+
 class Bottles:
     sprite: int
+
 
 class Drinks:
     cans: Cans
     bottles: Bottles
 
+
+class MilkType(IntEnum):
+    OnePercent = 1
+    TwoPercent = 2
+
+
+@dataclass
 class Milk:
-    type: MilkType
+    mtype: MilkType
     quantity: float
+
+
+class BreadType(IntEnum):
+    Wheat = 1
+    White = 2
+
 
 class Bread:
     type: BreadType
     quantity: float
 
+
+class MeatType(IntEnum):
+    Chicken = 1
+    Beef = 2
+
+
 class Meat:
     type: MeatType
     quantity: float
 
+
 @dataclass
 class OrderMessage:
+    @dataclass
     class OrderContents:
         veggies: Veggies
         drinks: Drinks
@@ -106,6 +130,18 @@ class OrderMessage:
 
     contents: OrderContents
     type: str = 'ORDER'
+
+    def __init__(self, contents: 'OrderMessage.OrderContents'):
+        self.contents = contents
+        self.type = 'ORDER'
+
+    def dump(self):
+        print("Dumping contents of Order Message:")
+        print(f"  Veggies: {self.contents.veggies}")
+        print(f"  Drinks: {self.contents.drinks}")
+        print(f"  Milk: {self.contents.milk}")
+        print(f"  Bread: {self.contents.bread}")
+        print(f"  Meat: {self.contents.meat}")
 
 
 @dataclass
