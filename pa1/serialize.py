@@ -12,6 +12,8 @@ import Messages.Cans
 import Messages.Bottles
 import Messages.Code
 from messages import OrderMessage, HealthMessage, ResponseMessage, GeneralStatus, DispenserStatus, ResponseCode
+from messages import *
+
 
 
 def serialize_health(msg):
@@ -45,7 +47,7 @@ def serialize_health(msg):
     Messages.HealthContents.HealthContentsAddDispenser(builder, dispenser)
     Messages.HealthContents.AddIcemaker(builder, msg.contents.icemaker)
     Messages.HealthContents.AddLightbulb(builder, lightbulb)
-    Messages.HealthContents.AddFridgeTemp(builder, msg.contents.fridge_temp)
+    Messages.HealthContents.AddFridxgeTemp(builder, msg.contents.fridge_temp)
     Messages.HealthContents.AddFreezerTemp(builder, msg.contents.freezer_temp)
     Messages.HealthContents.AddSensorStatus(builder, sensor_status)
     contents = Messages.HealthContents.HealthContentsEnd(builder)
@@ -66,25 +68,48 @@ def serialize_health(msg):
 def serialize_order(msg):
     builder = flatbuffers.Builder(0)
 
-    # Must call builder to build a string
+    # Serialize String
     message_type = builder.CreateString(msg.type)
 
+    # Serialize Veggies
     veggies = Messages.Veggies.CreateVeggies(builder, msg.contents.veggies.tomatoes, msg.contents.veggies.cucumbers)
-    cans = Messages.Cans.CreateCans(builder, msg.contents.drinks.cans)
-    bottles = Messages.Bottles.CreateBottles(builder, msg.contents.drinks.bottles)
 
+    # Serialize Drinks
+    cans = Messages.Cans.CreateCans(builder, msg.contents.drinks.cans.coke)
+    bottles = Messages.Bottles.CreateBottles(builder, msg.contents.drinks.bottles.sprite)
     Messages.Drinks.DrinksStart(builder)
     Messages.Drinks.AddCans(builder, cans)
     Messages.Drinks.AddBottles(builder, bottles)
     drinks = Messages.Drinks.DrinksEnd(builder)
 
+    # Serialize Milk
+    milk_offsets = []
+    for milk in msg.contents.milk:
+        milk_offset = Messages.Milk.CreateMilk(builder, milk.mtype, milk.quantity)
+        milk_offsets.append(milk_offset)
+    milk_vector = Messages.OrderContents.CreateMilkVector(builder, milk_offsets)
+
+    # Serialize Bread
+    bread_offsets = []
+    for bread in msg.contents.bread:
+        bread_offset = Messages.Bread.CreateBread(builder, bread.type, bread.quantity)
+        bread_offsets.append(bread_offset)
+    bread_vector = Messages.OrderContents.CreateBreadVector(builder, bread_offsets)
+
+    # Serialize Meat
+    meat_offsets = []
+    for meat in msg.contents.meat:
+        meat_offset = Messages.Meat.CreateMeat(builder, meat.type, meat.quantity)
+        meat_offsets.append(meat_offset)
+    meat_vector = Messages.OrderContents.CreateMeatVector(builder, meat_offsets)
+
     # Build OrderContents
     Messages.OrderContents.OrderContentsStart(builder)
     Messages.OrderContents.OrderContentsAddVeggies(builder, veggies)
     Messages.OrderContents.OrderContentsAddDrinks(builder, drinks)
-    Messages.OrderContents.OrderContentsAddMilk(builder, msg.contents.milk)
-    Messages.OrderContents.OrderContentsAddBread(builder, msg.contents.bread)
-    Messages.OrderContents.OrderContentsAddMeat(builder, msg.contents.meat)
+    Messages.OrderContents.OrderContentsAddMilk(builder, milk_vector)
+    Messages.OrderContents.OrderContentsAddBread(builder, bread_vector)
+    Messages.OrderContents.OrderContentsAddMeat(builder, meat_vector)
     contents = Messages.OrderContents.OrderContentsEnd(builder)
 
     # Build OrderMessage
@@ -147,6 +172,45 @@ def serialize_to_frames(cm):
     print("Serialize message to iterable list")
     return [serialize(cm)]
 
+def deserialize_order(buf):
+    message_packet = Messages.OrderMessage.OrderMessage.GetRootAs(buf, 0)
+    contents_packet = message_packet.Contents()
+
+    # Deserialize Veggies
+    veggies_packet = contents_packet.Veggies()
+    veggies = Veggies(veggies_packet.Tomatoes(), veggies_packet.Cucumbers())
+
+    # Deserialize Drinks
+    drinks_packet = contents_packet.Drinks()
+    cans_packet = drinks_packet.Cans()
+    cans = Cans(cans_packet.Coke())
+    bottles_packet = drinks_packet.Bottles()
+    bottles = Bottles(bottles_packet.Sprite())
+    drinks = Drinks(cans, bottles)
+
+    # Deserialize Milk
+    milk_list = []
+    for i in range(contents_packet.MilkLength()):
+        milk_packet = contents_packet.Milk(i)
+        milk_list.append(Milk(milk_packet.Type(), milk_packet.Quantity()))
+
+    # Deserialize Bread
+    bread_list = []
+    for i in range(contents_packet.BreadLength()):
+        bread_packet = contents_packet.Bread(i)
+        bread_list.append(Bread(bread_packet.Type(), bread_packet.Quantity()))
+
+    # Deserialize Meat
+    meat_list = []
+    for i in range(contents_packet.MeatLength()):
+        meat_packet = contents_packet.Meat(i)
+        meat_list.append(Meat(meat_packet.Type(), meat_packet.Quantity()))
+
+    # Create OrderContents and OrderMessage instance
+    order_contents = OrderMessage.OrderContents(veggies=veggies, drinks=drinks, milk=milk_list,
+                                                bread=bread_list, meat=meat_list)
+    return OrderMessage(order_contents)
+
 
 def deserialize_health(buf):
     message_packet = Messages.HealthMessage.HealthMessage.GetRootAs(buf, 0)
@@ -171,7 +235,7 @@ def deserialize_response(buf):
 # deserialize the incoming serialized structure into native data type
 def deserialize(buf, message_type):
     if message_type == 'ORDER':
-        pass  # return deserialize_order(buf)
+        return deserialize_order(buf)
     elif message_type == 'HEALTH':
         return deserialize_health(buf)
     elif message_type == 'RESPONSE':

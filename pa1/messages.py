@@ -70,21 +70,25 @@ class HealthMessage:
 
 
 class Veggies:
-    tomatoes: float
-    cucumbers: float
+    def __init__(self, tomatoes: float, cucumbers: float):
+        self.tomatoes = tomatoes
+        self.cucumbers = cucumbers
 
 
 class Cans:
-    coke: int
+    def __init__(self, coke: int):
+        self.coke = coke
 
 
 class Bottles:
-    sprite: int
+    def __init__(self, sprite: int):
+        self.sprite = sprite
 
 
 class Drinks:
-    cans: Cans
-    bottles: Bottles
+    def __init__(self, cans: Cans, bottles: Bottles):
+        self.cans = cans
+        self.bottles = bottles
 
 
 class MilkType(IntEnum):
