@@ -1,11 +1,11 @@
 import argparse
-# import flatbuffers
 import sys
 import zmq
+import messages as msgs
+import serialize as sz
+
 
 def driver(args):
-    # builder = flatbuffers.Builder(1024)
-
     # create context
     try:
         context = zmq.Context()
@@ -16,7 +16,7 @@ def driver(args):
         print("Some exception occurred getting context {}".format(sys.exc_info()[0]))
         return
 
-    # create socket
+    # create sockets
     try:
         health_socket = context.socket(zmq.REQ)
         order_socket = context.socket(zmq.REQ)
@@ -27,8 +27,7 @@ def driver(args):
         print("Some exception occurred getting REQ socket {}".format(sys.exc_info()[0]))
         return
 
-    # TODO - connect socket to multiple servers
-    # connect socket to servers
+    # connect sockets to servers
     try:
         health_string = "tcp://" + args.addr + ":" + str(args.hport)
         order_string = "tcp://" + args.addr + ":" + str(args.oport)
@@ -46,37 +45,51 @@ def driver(args):
         order_socket.close()
         return
 
-    # since we are a client, we actively send something to the server
-    for i in range(args.iters):
-        try:
-            health_socket.send(b"HelloWorld")
-            order_socket.send(b"HelloWorld")
-        except zmq.ZMQError as err:
-            print("ZeroMQ Error sending: {}".format(err))
-            health_socket.close()
-            order_socket.close()
-            return
-        except:
-            print("Some exception occurred receiving/sending {}".format(sys.exc_info()[0]))
-            health_socket.close()
-            order_socket.close()
-            return
+    # create message
+    msg = msgs.HealthMessage()
+    print("created message {}".format(msg))
+    health_socket.send_serialized(msg, sz.serialize_to_frames)
+    health_message = sz.deserialize_response(health_socket.recv())
+    print("received message {}".format(health_message))
 
-        try:
-            # receive a reply
-            health_message = health_socket.recv()
-            order_message = order_socket.recv()
-            print("Received replies in iteration {} is {} and {}".format(i, health_message, order_message))
-        except zmq.ZMQError as err:
-            print("ZeroMQ Error receiving: {}".format(err))
-            health_socket.close()
-            order_socket.close()
-            return
-        except:
-            print("Some exception occurred receiving/sending {}".format(sys.exc_info()[0]))
-            health_socket.close()
-            order_socket.close()
-            return
+    # create bad message
+    bad_msg = b'bad message'
+    print("created message {}".format(bad_msg))
+    health_socket.send(bad_msg)
+    bad_msg_resp = sz.deserialize_response(health_socket.recv())
+    print("received message {}".format(bad_msg_resp))
+
+    # since we are a client, we actively send something to the server
+    # for i in range(args.iters):
+    #     try:
+    #         health_socket.send(b"HelloWorld")
+    #         order_socket.send(b"HelloWorld")
+    #     except zmq.ZMQError as err:
+    #         print("ZeroMQ Error sending: {}".format(err))
+    #         health_socket.close()
+    #         order_socket.close()
+    #         return
+    #     except:
+    #         print("Some exception occurred receiving/sending {}".format(sys.exc_info()[0]))
+    #         health_socket.close()
+    #         order_socket.close()
+    #         return
+    #
+    #     try:
+    #         # receive a reply
+    #         health_message = health_socket.recv()
+    #         order_message = order_socket.recv()
+    #         print("Received replies in iteration {} is {} and {}".format(i, health_message, order_message))
+    #     except zmq.ZMQError as err:
+    #         print("ZeroMQ Error receiving: {}".format(err))
+    #         health_socket.close()
+    #         order_socket.close()
+    #         return
+    #     except:
+    #         print("Some exception occurred receiving/sending {}".format(sys.exc_info()[0]))
+    #         health_socket.close()
+    #         order_socket.close()
+    #         return
 
 
 ##################################
@@ -87,10 +100,13 @@ def parseCmdLineArgs():
     parser = argparse.ArgumentParser()
 
     # add optional arguments
-    parser.add_argument("-a", "--addr", default="127.0.0.1", help="IP Address to connect to (default: localhost i.e., 127.0.0.1)")
+    parser.add_argument("-a", "--addr", default="127.0.0.1",
+                        help="IP Address to connect to (default: localhost i.e., 127.0.0.1)")
     parser.add_argument("-i", "--iters", type=int, default=10, help="Number of iterations (default: 10")
-    parser.add_argument("-p1", "--hport", type=int, default=5556, help="Health port that server is listening on (default: 5556)")
-    parser.add_argument("-p2", "--oport", type=int, default=5557, help="Order port that server is listening on (default: 5557)")
+    parser.add_argument("-p1", "--hport", type=int, default=5556,
+                        help="Health port that server is listening on (default: 5556)")
+    parser.add_argument("-p2", "--oport", type=int, default=5557,
+                        help="Order port that server is listening on (default: 5557)")
     args = parser.parse_args()
 
     return args
