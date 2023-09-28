@@ -47,7 +47,7 @@ def serialize_health(msg):
     Messages.HealthContents.HealthContentsAddDispenser(builder, dispenser)
     Messages.HealthContents.AddIcemaker(builder, msg.contents.icemaker)
     Messages.HealthContents.AddLightbulb(builder, lightbulb)
-    Messages.HealthContents.AddFridxgeTemp(builder, msg.contents.fridge_temp)
+    Messages.HealthContents.AddFridgeTemp(builder, msg.contents.fridge_temp)
     Messages.HealthContents.AddFreezerTemp(builder, msg.contents.freezer_temp)
     Messages.HealthContents.AddSensorStatus(builder, sensor_status)
     contents = Messages.HealthContents.HealthContentsEnd(builder)

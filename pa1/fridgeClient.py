@@ -1,7 +1,7 @@
 import argparse
 import sys
 import zmq
-import messages as msgs
+from messages import HealthMessage, OrderMessage, Veggies, Bottles, Cans, Milk, Drinks
 import serialize as sz
 
 
@@ -45,19 +45,26 @@ def driver(args):
         order_socket.close()
         return
 
-    # create message
-    msg = msgs.HealthMessage()
+    # create and send health message
+    msg = HealthMessage()
     print("created message {}".format(msg))
     health_socket.send_serialized(msg, sz.serialize_to_frames)
     health_message = sz.deserialize_response(health_socket.recv())
     print("received message {}".format(health_message))
 
-    # create bad message
+    # create and send bad health message
     bad_msg = b'bad message'
     print("created message {}".format(bad_msg))
     health_socket.send(bad_msg)
     bad_msg_resp = sz.deserialize_response(health_socket.recv())
     print("received message {}".format(bad_msg_resp))
+
+    # create and send order message
+    msg = CreateOrder()
+    print("created message {}".format(msg))
+    order_socket.send_serialized(msg, sz.serialize_to_frames)
+    order_message = sz.deserialize_response(order_socket.recv())
+    print("received message {}".format(order_message))
 
     # since we are a client, we actively send something to the server
     # for i in range(args.iters):
@@ -91,6 +98,13 @@ def driver(args):
     #         order_socket.close()
     #         return
 
+def CreateOrder():
+    veggies = Veggies(0.2, 0.4)
+    cans = Cans(1)
+    bottles = Bottles(0)
+    drinks = Drinks(cans, bottles)
+    contents = OrderMessage.OrderContents(veggies, drinks, [], [], [])
+    return OrderMessage(contents)
 
 ##################################
 # Command line parsing

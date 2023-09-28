@@ -1,10 +1,13 @@
 import argparse
+import messages
 import sys
+import serialize as sz
 import time
 import zmq
-
+from healthserver import sendBadResponse
 
 def driver(args):
+    # create context
     try:
         context = zmq.Context()  # returns a singleton object
     except zmq.ZMQError as err:
@@ -14,6 +17,7 @@ def driver(args):
         print("Some exception occurred getting context {}".format(sys.exc_info()[0]))
         return
 
+    # create socket
     try:
         socket = context.socket(zmq.REP)
     except zmq.ZMQError as err:
@@ -23,6 +27,7 @@ def driver(args):
         print("Some exception occurred getting REP socket {}".format(sys.exc_info()[0]))
         return
 
+    # bind socket
     try:
         bind_string = "tcp://" + args.intf + ":" + str(args.port)
         socket.bind(bind_string)
@@ -40,24 +45,26 @@ def driver(args):
     while True:
         try:
             #  Wait for next request from client
-            message = socket.recv()
+            buf = socket.recv()
+            message = sz.deserialize(buf, 'ORDER')
             print("Received request: %s" % message)
         except zmq.ZMQError as err:
             print("ZeroMQ Error receiving: {}".format(err))
-            socket.close()
-            return
+            sendBadResponse(socket)
+            continue
         except:
             print("Some exception occurred receiving/sending {}".format(sys.exc_info()[0]))
-            socket.close()
-            return
+            sendBadResponse(socket)
+            continue
 
         #  Do some 'work'. In this case we just sleep.
         time.sleep(1)
 
         try:
             #  Send reply back to client
-            print("Send dummy reply")
-            socket.send(b"ACK")
+            ack = messages.ResponseMessage(code=messages.ResponseCode.OK, contents="You are Healthy")
+            ack = sz.serialize(ack)
+            print("Send reply {}".format(ack))
         except zmq.ZMQError as err:
             print("ZeroMQ Error sending: {}".format(err))
             socket.close()
