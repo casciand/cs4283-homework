@@ -8,6 +8,30 @@ syntax = "proto3";
 
 package messages;
 
+enum DispenserStatus {
+  OPTIMAL = 0;
+  PARTIAL = 1;
+  BLOCKAGE = 2;
+}
+
+enum Status {
+  GOOD = 0;
+  BAD = 1;
+}
+
+enum ResponseStatus {
+  OK = 0;
+  BAD_REQUEST = 1;
+}
+
+message HealthMessage {
+  optional DispenserStatus dispenser = 1;
+  optional uint32 icemaker = 2;
+  optional Status lightbulb = 3;
+  optional uint32 fridge_temp = 4;
+  optional uint32 freezer_temp = 5;
+  optional Status sensor_status = 6;
+}
 
 message OrderContents {
     message Veggies {
@@ -73,8 +97,9 @@ message Order {
 
 // In our service, we do not expect anything coming back and so we declare an
 // empty response.
-message Response
-{
+message Response {
+  optional ResponseStatus code = 7;
+  optional string contents = 8;
 }
 
 
