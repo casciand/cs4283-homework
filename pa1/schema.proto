@@ -1,0 +1,94 @@
+// This schema mimics the Flatbuf schema, however, using the Protocol Buffers syntax
+
+// Please see https://protobuf.dev/programming-guides/proto3/ for details on the different data types
+
+// Let us use the Version 3 syntax as that is the newest and feature rich. This must be specified
+// else the compiler will choose older version
+syntax = "proto3";
+
+package messages;
+
+
+message OrderContents {
+    message Veggies {
+        optional float tomato = 1;
+        optional float cucumber = 2;
+    }
+
+    message Drinks {
+        message Cans {
+            optional int32 coke = 1;
+        }
+
+        message Bottles {
+            optional int32 sprite = 1;
+        }
+
+        optional Cans cans = 1;
+        optional Bottles bottles = 2;
+    }
+
+    message Milk {
+        enum MilkType {
+            WHOLE = 0;
+            SKIM = 1;
+        }
+
+        optional MilkType type = 1;
+        optional float quantity = 2;
+    }
+
+    message Bread {
+        enum BreadType {
+            WHITE = 0;
+            WHEAT = 1;
+        }
+
+        optional BreadType type = 1;
+        optional float quantity = 2;
+    }
+
+    message Meat {
+        enum MeatType {
+            BEEF = 0;
+            CHICKEN = 1;
+            PORK = 2;
+        }
+
+        optional MeatType type = 1;
+        optional float quantity = 2;
+    }
+
+    optional Veggies veggies = 1;
+    optional Drinks drinks = 2;
+    repeated Milk milk = 3;
+    repeated Bread bread = 4;
+    repeated Meat meat = 5;
+}
+
+message Order {
+    optional string type = 1;
+    optional OrderContents contents = 2;
+}
+
+// In our service, we do not expect anything coming back and so we declare an
+// empty response.
+message Response
+{
+}
+
+
+// Note that in your assignment, since you will have at least two separate types of
+// There is no "top level" root structure as in FlatBufs. We decide what is top for us
+
+// Protocol Buffers also allow the facility to define services so as to support
+// remote procedure calls. This did not exist in FlatBufs, but we declare one
+// here as gRPC is a remote procedure call approach where the service must
+// provide an interface declaring what is accepted as a request and what goes
+// back as a response for that request. A response can comprise empty field if
+// nothing is expected as a response.
+
+service DummyService
+{
+    rpc method (Order) returns (Response) {};
+}
