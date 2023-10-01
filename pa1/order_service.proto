@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package order;
+
+message OrderRequest {
+    string contents = 1;
+}
+
+message OrderResponse {
+    string message = 1;
+}
+
+service OrderService {
+    rpc PlaceOrder(OrderRequest) returns (OrderResponse);
+}
