@@ -10,17 +10,41 @@ class Cans(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def SizeOf(cls):
-        return 4
+    def GetRootAs(cls, buf, offset=0):
+        n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
+        x = Cans()
+        x.Init(buf, n + offset)
+        return x
 
+    @classmethod
+    def GetRootAsCans(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Cans
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Cans
-    def Coke(self): return self._tab.Get(flatbuffers.number_types.Int32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
+    def Coke(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
 
-def CreateCans(builder, coke):
-    builder.Prep(4, 4)
-    builder.PrependInt32(coke)
-    return builder.Offset()
+def CansStart(builder):
+    builder.StartObject(1)
+
+def Start(builder):
+    CansStart(builder)
+
+def CansAddCoke(builder, coke):
+    builder.PrependInt32Slot(0, coke, 0)
+
+def AddCoke(builder, coke):
+    CansAddCoke(builder, coke)
+
+def CansEnd(builder):
+    return builder.EndObject()
+
+def End(builder):
+    return CansEnd(builder)

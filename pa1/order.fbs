@@ -17,42 +17,41 @@ enum BreadType : byte { WHITE, WHEAT }
 
 enum MeatType : byte { BEEF, CHICKEN, PORK }
 
-// Structs
-struct Veggies
+// Tables
+table Veggies
 {
     tomato: float;
     cucumber: float;
 }
 
-struct Cans
+table Cans
 {
     coke: int;
 }
 
-struct Bottles
+table Bottles
 {
     sprite: int;
 }
 
-struct Milk
+table Milk
 {
     type: MilkType;
     quantity: float;
 }
 
-struct Bread
+table Bread
 {
     type: BreadType;
     quantity: float;
 }
 
-struct Meat
+table Meat
 {
     type: MeatType;
     quantity: float;
 }
 
-// Tables
 table Drinks
 {
     cans: Cans;

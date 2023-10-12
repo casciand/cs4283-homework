@@ -99,12 +99,12 @@ def driver(args):
     #         return
 
 def CreateOrder():
-    veggies = Veggies(0.2, 0.4)
-    cans = Cans(1)
-    bottles = Bottles(0)
-    drinks = Drinks(cans, bottles)
-    contents = OrderMessage.OrderContents(veggies, drinks, [], [], [])
-    return OrderMessage(contents)
+    # veggies = Veggies(0.2, 0.4)
+    # cans = Cans(1)
+    # bottles = Bottles(0)
+    # drinks = Drinks(cans, bottles)
+    # contents = OrderMessage.OrderContents(veggies, drinks, [], [], [])
+    return OrderMessage()
 
 ##################################
 # Command line parsing

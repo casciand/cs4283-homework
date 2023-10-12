@@ -4,7 +4,7 @@ import sys
 import serialize as sz
 import time
 import zmq
-from healthserver import sendBadResponse
+from healthServer import sendBadResponse
 
 def driver(args):
     # create context
@@ -47,7 +47,8 @@ def driver(args):
             #  Wait for next request from client
             buf = socket.recv()
             message = sz.deserialize(buf, 'ORDER')
-            print("Received request: %s" % message)
+            print("Received request: ")
+            message.dump()
         except zmq.ZMQError as err:
             print("ZeroMQ Error receiving: {}".format(err))
             sendBadResponse(socket)

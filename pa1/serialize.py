@@ -11,6 +11,9 @@ import Messages.Drinks
 import Messages.Cans
 import Messages.Bottles
 import Messages.Code
+import Messages.Milk
+import Messages.Bread
+import Messages.Meat
 from messages import OrderMessage, HealthMessage, ResponseMessage, GeneralStatus, DispenserStatus, ResponseCode
 from messages import *
 
@@ -72,36 +75,66 @@ def serialize_order(msg):
     message_type = builder.CreateString(msg.type)
 
     # Serialize Veggies
-    veggies = Messages.Veggies.CreateVeggies(builder, msg.contents.veggies.tomatoes, msg.contents.veggies.cucumbers)
+    Messages.Veggies.Start(builder)
+    Messages.Veggies.AddCucumber(builder, msg.contents.veggies.cucumber)
+    Messages.Veggies.AddTomato(builder, msg.contents.veggies.tomato)
+    veggies = Messages.Veggies.End(builder)
 
     # Serialize Drinks
-    cans = Messages.Cans.CreateCans(builder, msg.contents.drinks.cans.coke)
-    bottles = Messages.Bottles.CreateBottles(builder, msg.contents.drinks.bottles.sprite)
-    Messages.Drinks.DrinksStart(builder)
+    Messages.Cans.Start(builder)
+    Messages.Cans.AddCoke(builder, msg.contents.drinks.cans.coke)
+    cans = Messages.Cans.End(builder)
+
+    Messages.Bottles.Start(builder)
+    Messages.Bottles.AddSprite(builder, msg.contents.drinks.bottles.sprite)
+    bottles = Messages.Bottles.End(builder)
+
+    Messages.Drinks.Start(builder)
     Messages.Drinks.AddCans(builder, cans)
     Messages.Drinks.AddBottles(builder, bottles)
-    drinks = Messages.Drinks.DrinksEnd(builder)
+    drinks = Messages.Drinks.End(builder)
 
     # Serialize Milk
     milk_offsets = []
     for milk in msg.contents.milk:
-        milk_offset = Messages.Milk.CreateMilk(builder, milk.mtype, milk.quantity)
-        milk_offsets.append(milk_offset)
-    milk_vector = Messages.OrderContents.CreateMilkVector(builder, milk_offsets)
+        Messages.Milk.Start(builder)
+        Messages.Milk.AddType(builder, milk.type)
+        Messages.Milk.AddQuantity(builder, milk.quantity)
+        offset = Messages.Milk.End(builder)
+        milk_offsets.append(offset)
+
+    Messages.OrderContents.StartMilkVector(builder, len(milk_offsets))
+    for offset in milk_offsets:
+        builder.PrependUOffsetTRelative(offset)
+    milk_vector = builder.EndVector()
 
     # Serialize Bread
     bread_offsets = []
     for bread in msg.contents.bread:
-        bread_offset = Messages.Bread.CreateBread(builder, bread.type, bread.quantity)
-        bread_offsets.append(bread_offset)
-    bread_vector = Messages.OrderContents.CreateBreadVector(builder, bread_offsets)
+        Messages.Bread.Start(builder)
+        Messages.Bread.AddType(builder, bread.type)
+        Messages.Bread.AddQuantity(builder, bread.quantity)
+        offset = Messages.Bread.End(builder)
+        bread_offsets.append(offset)
+
+    Messages.OrderContents.StartBreadVector(builder, len(bread_offsets))
+    for offset in bread_offsets:
+        builder.PrependUOffsetTRelative(offset)
+    bread_vector = builder.EndVector()
 
     # Serialize Meat
     meat_offsets = []
     for meat in msg.contents.meat:
-        meat_offset = Messages.Meat.CreateMeat(builder, meat.type, meat.quantity)
-        meat_offsets.append(meat_offset)
-    meat_vector = Messages.OrderContents.CreateMeatVector(builder, meat_offsets)
+        Messages.Meat.Start(builder)
+        Messages.Meat.AddType(builder, meat.type)
+        Messages.Meat.AddQuantity(builder, meat.quantity)
+        offset = Messages.Meat.End(builder)
+        meat_offsets.append(offset)
+
+    Messages.OrderContents.StartMeatVector(builder, len(meat_offsets))
+    for offset in meat_offsets:
+        builder.PrependUOffsetTRelative(offset)
+    meat_vector = builder.EndVector()
 
     # Build OrderContents
     Messages.OrderContents.OrderContentsStart(builder)
@@ -178,7 +211,7 @@ def deserialize_order(buf):
 
     # Deserialize Veggies
     veggies_packet = contents_packet.Veggies()
-    veggies = Veggies(veggies_packet.Tomatoes(), veggies_packet.Cucumbers())
+    veggies = Veggies(veggies_packet.Tomato(), veggies_packet.Cucumber())
 
     # Deserialize Drinks
     drinks_packet = contents_packet.Drinks()

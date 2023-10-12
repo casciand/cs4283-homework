@@ -28,7 +28,7 @@ class Drinks(object):
     def Cans(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            x = o + self._tab.Pos
+            x = self._tab.Indirect(o + self._tab.Pos)
             from Messages.Cans import Cans
             obj = Cans()
             obj.Init(self._tab.Bytes, x)
@@ -39,7 +39,7 @@ class Drinks(object):
     def Bottles(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            x = o + self._tab.Pos
+            x = self._tab.Indirect(o + self._tab.Pos)
             from Messages.Bottles import Bottles
             obj = Bottles()
             obj.Init(self._tab.Bytes, x)
@@ -53,13 +53,13 @@ def Start(builder):
     DrinksStart(builder)
 
 def DrinksAddCans(builder, cans):
-    builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(cans), 0)
+    builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(cans), 0)
 
 def AddCans(builder, cans):
     DrinksAddCans(builder, cans)
 
 def DrinksAddBottles(builder, bottles):
-    builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(bottles), 0)
+    builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(bottles), 0)
 
 def AddBottles(builder, bottles):
     DrinksAddBottles(builder, bottles)
