@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service HealthService {
+    rpc CheckHealth(HealthRequest) returns (HealthResponse);
+}
+
+message HealthRequest {
+    string request_content = 1; 
+}
+
+message HealthResponse {
+    int32 code = 1;
+    string message = 2;
+}

@@ -19,20 +19,20 @@ class ResponseCode(Enum):
     BAD_REQUEST = "BAD_REQUEST"
 
 
-class MilkType(Enum):
-    WHOLE = "WHOLE"
-    SKIM = "SKIM"
+class MilkType(IntEnum):
+    WHOLE = 1
+    SKIM = 2
 
 
-class BreadType(Enum):
-    WHITE = "WHITE"
-    WHEAT = "WHEAT"
+class BreadType(IntEnum):
+    WHITE = 1
+    WHEAT = 2
 
 
-class MeatType(Enum):
-    CHICKEN = "CHICKEN"
-    BEEF = "BEEF"
-    PORK = "PORK"
+class MeatType(IntEnum):
+    CHICKEN = 1
+    BEEF = 2
+    PORK = 3
 
 
 @dataclass
@@ -70,72 +70,83 @@ class HealthMessage:
 
 
 class Veggies:
-    def __init__(self, tomatoes: float, cucumbers: float):
-        self.tomatoes = tomatoes
-        self.cucumbers = cucumbers
+    def __init__(self, tomato: float, cucumber: float):
+        self.tomato = tomato
+        self.cucumber = cucumber
+
+    def __repr__(self):
+        return f'\n\ttomatoes: {self.tomato}\n' \
+               f'\tcucumbers: {self.cucumber}'
 
 
 class Cans:
     def __init__(self, coke: int):
         self.coke = coke
 
+    def __repr__(self):
+        return f'\n\t\tcoke: {self.coke}'
+
 
 class Bottles:
     def __init__(self, sprite: int):
         self.sprite = sprite
 
+    def __repr__(self):
+        return f'\n\t\tsprite: {self.sprite}'
+
 
 class Drinks:
-    def __init__(self, cans: Cans, bottles: Bottles):
+    def __init__(self, cans: Cans = Cans(2), bottles: Bottles = Bottles(3)):
         self.cans = cans
         self.bottles = bottles
 
+    def __repr__(self):
+        return f'\n\tcans: {self.cans}\n' \
+               f'\tbottles: {self.bottles}'
 
-class MilkType(IntEnum):
-    OnePercent = 1
-    TwoPercent = 2
 
-
-@dataclass
 class Milk:
-    mtype: MilkType
-    quantity: float
+    def __init__(self, type: MilkType = MilkType.WHOLE, quantity: float = 3):
+        self.type = type
+        self.quantity = quantity
 
-
-class BreadType(IntEnum):
-    Wheat = 1
-    White = 2
+    def __repr__(self):
+        return f'({self.type}, {self.quantity})'
 
 
 class Bread:
-    type: BreadType
-    quantity: float
+    def __init__(self, type: BreadType = BreadType.WHEAT, quantity: float = 3):
+        self.type = type
+        self.quantity = quantity
 
-
-class MeatType(IntEnum):
-    Chicken = 1
-    Beef = 2
+    def __repr__(self):
+        return f'({self.type}, {self.quantity})'
 
 
 class Meat:
-    type: MeatType
-    quantity: float
+    def __init__(self, type: MeatType = MeatType.PORK, quantity: float = 3):
+        self.type = type
+        self.quantity = quantity
+
+    def __repr__(self):
+        return f'({self.type}, {self.quantity})'
 
 
 @dataclass
 class OrderMessage:
     @dataclass
     class OrderContents:
-        veggies: Veggies
-        drinks: Drinks
-        milk: List[Milk]
-        bread: List[Bread]
-        meat: List[Meat]
+        def __init__(self, veggies=Veggies(2, 3), drinks=Drinks(), milk=[Milk()], bread=[Bread()], meat=[Meat()]):
+            self.veggies = veggies
+            self.drinks = drinks
+            self.milk = milk
+            self.bread = bread
+            self.meat = meat
 
     contents: OrderContents
     type: str = 'ORDER'
 
-    def __init__(self, contents: 'OrderMessage.OrderContents'):
+    def __init__(self, contents: OrderContents = OrderContents()):
         self.contents = contents
         self.type = 'ORDER'
 
@@ -159,24 +170,3 @@ class ResponseMessage:
         print("Type: {}".format(self.type))
         print("Code: {}".format(self.code))
         print("Contents: {}".format(self.contents))
-
-# Example Usage:
-
-# health_contents = HealthContents(
-#     dispenser=DispenserStatus.OPTIMAL,
-#     icemaker=85,
-#     lightbulb=LightbulbStatus.GOOD,
-#     fridge_temp=4,  # 4 degrees Celsius as an example
-#     freezer_temp=-18,  # -18 degrees Celsius as an example
-#     sensor_status=SensorStatus.GOOD
-# )
-#
-# health_msg = HealthMessage(contents=health_contents)
-#
-# response_msg = ResponseMessage(
-#     code=ResponseCode.OK,
-#     contents="You are Healthy"
-# )
-#
-# print(health_msg)
-# print(response_msg)
