@@ -5,7 +5,7 @@ import grpc
 import schema_pb2 as schema__pb2
 
 
-class DummyServiceStub(object):
+class OrderServiceStub(object):
     """Note that in your assignment, since you will have at least two separate types of
     There is no "top level" root structure as in FlatBufs. We decide what is top for us
 
@@ -25,13 +25,13 @@ class DummyServiceStub(object):
             channel: A grpc.Channel.
         """
         self.method = channel.unary_unary(
-                '/messages.DummyService/method',
+                '/messages.OrderService/method',
                 request_serializer=schema__pb2.Order.SerializeToString,
                 response_deserializer=schema__pb2.Response.FromString,
                 )
 
 
-class DummyServiceServicer(object):
+class OrderServiceServicer(object):
     """Note that in your assignment, since you will have at least two separate types of
     There is no "top level" root structure as in FlatBufs. We decide what is top for us
 
@@ -51,7 +51,7 @@ class DummyServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_DummyServiceServicer_to_server(servicer, server):
+def add_OrderServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'method': grpc.unary_unary_rpc_method_handler(
                     servicer.method,
@@ -60,12 +60,12 @@ def add_DummyServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'messages.DummyService', rpc_method_handlers)
+            'messages.OrderService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class DummyService(object):
+class OrderService(object):
     """Note that in your assignment, since you will have at least two separate types of
     There is no "top level" root structure as in FlatBufs. We decide what is top for us
 
@@ -89,8 +89,69 @@ class DummyService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/messages.DummyService/method',
+        return grpc.experimental.unary_unary(request, target, '/messages.OrderService/method',
             schema__pb2.Order.SerializeToString,
+            schema__pb2.Response.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+
+class HealthServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.method = channel.unary_unary(
+                '/messages.HealthService/method',
+                request_serializer=schema__pb2.HealthMessage.SerializeToString,
+                response_deserializer=schema__pb2.Response.FromString,
+                )
+
+
+class HealthServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def method(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_HealthServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'method': grpc.unary_unary_rpc_method_handler(
+                    servicer.method,
+                    request_deserializer=schema__pb2.HealthMessage.FromString,
+                    response_serializer=schema__pb2.Response.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'messages.HealthService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class HealthService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def method(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/messages.HealthService/method',
+            schema__pb2.HealthMessage.SerializeToString,
             schema__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

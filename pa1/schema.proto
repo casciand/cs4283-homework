@@ -113,7 +113,12 @@ message Response {
 // back as a response for that request. A response can comprise empty field if
 // nothing is expected as a response.
 
-service DummyService
+service OrderService
 {
     rpc method (Order) returns (Response) {};
+}
+
+service HealthService
+{
+    rpc method (HealthMessage) returns (Response) {};
 }
