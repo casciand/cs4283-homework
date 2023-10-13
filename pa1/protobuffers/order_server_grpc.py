@@ -3,8 +3,6 @@ import grpc
 import time
 import order_service_pb2
 import order_service_pb2_grpc
-import messages
-import serialize as sz
 from concurrent import futures
 
 

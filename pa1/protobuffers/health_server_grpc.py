@@ -4,8 +4,6 @@ import argparse
 import time
 import health_service_pb2
 import health_service_pb2_grpc
-import messages
-import serialize as sz
 
 class HealthServicer(health_service_pb2_grpc.HealthServiceServicer):
 

@@ -46,8 +46,9 @@ def driver(args):
             #  Wait for next request from client
             buf = socket.recv()
             message = sz.deserialize(buf, 'HEALTH')
-            print("Received request: ")
-            message.dump()
+            print("Received request:\n")
+            print(message)
+            print()
         except zmq.ZMQError as err:
             print("ZeroMQ Error receiving: {}".format(err))
             sendBadResponse(socket)
@@ -66,10 +67,10 @@ def driver(args):
 
         try:
             #  Send reply back to client
-            ack = messages.ResponseMessage(code=messages.ResponseCode.OK,contents="You are Healthy")
+            ack = messages.ResponseMessage(code=messages.ResponseCode.OK, contents="You are Healthy")
             ack = sz.serialize(ack)
-            print("Send reply {}".format(ack))
             socket.send(ack)
+            print("Sent reply {}".format(ack))
         except zmq.ZMQError as err:
             print("ZeroMQ Error sending: {}".format(err))
             socket.close()

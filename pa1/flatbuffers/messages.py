@@ -1,17 +1,16 @@
-from typing import List, Union, Tuple
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, IntEnum
 
 
-class DispenserStatus(Enum):
-    OPTIMAL = "OPTIMAL"
-    PARTIAL = "PARTIAL"
-    BLOCKAGE = "BLOCKAGE"
+class DispenserStatus(IntEnum):
+    OPTIMAL = 1
+    PARTIAL = 2
+    BLOCKAGE = 3
 
 
-class GeneralStatus(Enum):
-    GOOD = "GOOD"
-    BAD = "BAD"
+class GeneralStatus(IntEnum):
+    GOOD = 1
+    BAD = 2
 
 
 class ResponseCode(Enum):
@@ -38,23 +37,23 @@ class MeatType(IntEnum):
 @dataclass
 class HealthMessage:
     class HealthContents:
-        dispenser: DispenserStatus = DispenserStatus.OPTIMAL.value
+        dispenser: DispenserStatus = DispenserStatus.OPTIMAL
         icemaker: int = 97  # efficiency percentage, e.g., 90 for 90%
-        lightbulb: GeneralStatus = GeneralStatus.GOOD.value
+        lightbulb: GeneralStatus = GeneralStatus.GOOD
         fridge_temp: int = 23
         freezer_temp: int = -150
-        sensor_status: GeneralStatus = GeneralStatus.BAD.value
+        sensor_status: GeneralStatus = GeneralStatus.BAD
         # You can add additional fields here, for example:
         motor_status: str = "RUNNING"  # just an example, can be anything relevant
 
-        def dump(self):
-            print("  dispenser: {}".format(self.dispenser))
-            print("  icemaker: {}".format(self.icemaker))
-            print("  lightbulb: {}".format(self.lightbulb))
-            print("  fridge_temp: {}".format(self.fridge_temp))
-            print("  freezer_temp: {}".format(self.freezer_temp))
-            print("  sensor_status: {}".format(self.sensor_status))
-            print("  motor_status: {}".format(self.motor_status))
+        def __repr__(self):
+            return f'  dispenser: {self.dispenser.name}\n' \
+                   f'  icemaker: {self.icemaker}\n' \
+                   f'  lightbulb: {self.lightbulb.name}\n' \
+                   f'  fridge_temp: {self.fridge_temp}\n' \
+                   f'  freezer_temp: {self.freezer_temp}\n' \
+                   f'  sensor_status: {self.sensor_status.name}\n' \
+                   f'  motor_status: {self.motor_status}'
 
     """ Native representation for HEALTH message """
     contents: HealthContents  # Using the 'Contents' dataclass as an attribute
@@ -63,10 +62,10 @@ class HealthMessage:
     def __init__(self):
         self.contents = self.HealthContents()
 
-    def dump(self):
-        print("Type: {}".format(self.type))
-        print("Contents:")
-        self.contents.dump()
+    def __repr__(self):
+        return f'Type: {self.type}\n' \
+               f'Contents:\n' \
+               f'{self.contents}'
 
 
 class Veggies:
@@ -75,8 +74,8 @@ class Veggies:
         self.cucumber = cucumber
 
     def __repr__(self):
-        return f'\n\ttomatoes: {self.tomato}\n' \
-               f'\tcucumbers: {self.cucumber}'
+        return f'    tomato: {self.tomato}\n' \
+               f'    cucumber: {self.cucumber}'
 
 
 class Cans:
@@ -84,7 +83,7 @@ class Cans:
         self.coke = coke
 
     def __repr__(self):
-        return f'\n\t\tcoke: {self.coke}'
+        return f'      coke: {self.coke}'
 
 
 class Bottles:
@@ -92,7 +91,7 @@ class Bottles:
         self.sprite = sprite
 
     def __repr__(self):
-        return f'\n\t\tsprite: {self.sprite}'
+        return f'      sprite: {self.sprite}'
 
 
 class Drinks:
@@ -101,8 +100,8 @@ class Drinks:
         self.bottles = bottles
 
     def __repr__(self):
-        return f'\n\tcans: {self.cans}\n' \
-               f'\tbottles: {self.bottles}'
+        return f'    cans:\n{self.cans}\n' \
+               f'    bottles:\n{self.bottles}'
 
 
 class Milk:
@@ -150,13 +149,14 @@ class OrderMessage:
         self.contents = contents
         self.type = 'ORDER'
 
-    def dump(self):
-        print("Dumping contents of Order Message:")
-        print(f"  Veggies: {self.contents.veggies}")
-        print(f"  Drinks: {self.contents.drinks}")
-        print(f"  Milk: {self.contents.milk}")
-        print(f"  Bread: {self.contents.bread}")
-        print(f"  Meat: {self.contents.meat}")
+    def __str__(self):
+        return f'Type: {self.type}\n' \
+               f'Contents:\n' \
+               f'  Veggies:\n{self.contents.veggies}\n' \
+               f'  Drinks:\n{self.contents.drinks}\n' \
+               f'  Milk: {self.contents.milk}\n' \
+               f'  Bread: {self.contents.bread}\n' \
+               f'  Meat: {self.contents.meat}'
 
 
 @dataclass
@@ -166,7 +166,7 @@ class ResponseMessage:
     contents: str  # e.g., "Order Placed", "You are Healthy", "Bad Request"
     type: str = "RESPONSE"
 
-    def dump(self):
-        print("Type: {}".format(self.type))
-        print("Code: {}".format(self.code))
-        print("Contents: {}".format(self.contents))
+    def __str__(self):
+        return f'Type: {self.type}\n' \
+               f'Code: {self.code}\n' \
+               f'Contents: {self.contents}'

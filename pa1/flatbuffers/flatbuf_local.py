@@ -1,16 +1,16 @@
 import time
-from messages import HealthMessage, ResponseMessage, OrderMessage, ResponseCode, Bread, Drinks, Meat, Milk, Veggies, BreadType, MeatType
+from messages import HealthMessage
 import serialize as sz
 
 
 # DEMO: Serializes and deserializes a message
 def main():
     # cm = ResponseMessage(ResponseCode.OK, "Order Placed")
-    cm = OrderMessage()
-    # cm = HealthMessage()
+    # cm = OrderMessage()
+    cm = HealthMessage()
 
     print("Message contents before serialization:\n")
-    cm.dump()
+    print(cm)
 
     # Serialize message
     start_time = time.time()
@@ -25,7 +25,7 @@ def main():
     print("Deserialization took {} secs\n".format(end_time - start_time))
 
     print("Message contents after serialization:\n")
-    cm.dump()
+    print(cm)
 
 
 if __name__ == '__main__':

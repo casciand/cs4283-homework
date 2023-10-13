@@ -58,5 +58,6 @@ def main():
     deserialized_message.ParseFromString(serialized_data)
     print("Deserialized Health Message: \n{}".format(deserialized_message))
 
+
 if __name__ == '__main__':
     main()

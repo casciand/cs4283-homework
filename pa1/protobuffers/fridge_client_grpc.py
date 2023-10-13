@@ -1,8 +1,6 @@
 import argparse
 import grpc
-import sys
-from messages import HealthMessage, OrderMessage, Veggies, Bottles, Cans, Milk, Drinks
-import order_service_pb2
+from messages import OrderMessage
 import order_service_pb2_grpc
 import health_service_pb2
 import health_service_pb2_grpc
@@ -22,25 +20,13 @@ def driver(args):
         print(f"RPC failed with code {rpc_err.code()} and details: {rpc_err.details()}")
 
     # Send order
-    order_request = CreateOrder()
+    order_request = OrderMessage()
     try:
         order_response = order_stub.PlaceOrder(order_request)
         print("Received order response:", order_response.message)
     except grpc.RpcError as rpc_err:
         print(f"RPC failed with code {rpc_err.code()} and details: {rpc_err.details()}")
 
-def CreateOrder():
-    veggies = Veggies(0.2, 0.4)
-    cans = Cans(1)
-    bottles = Bottles(0)
-    drinks = Drinks(cans, bottles)
-
-    # Update according to your OrderMessage structure
-    contents = OrderMessage.OrderContents(veggies, drinks, [], [], [])
-
-    # Convert the OrderMessage to gRPC message
-    grpc_order = order_service_pb2.OrderRequest(contents=str(contents))  # Adjust as needed
-    return grpc_order
 
 def parseCmdLineArgs():
     parser = argparse.ArgumentParser()

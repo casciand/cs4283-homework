@@ -25,34 +25,14 @@ def serialize_health(msg):
     # Must call builder to build a string
     message_type = builder.CreateString(msg.type)
 
-    # Set lightbulb status
-    if msg.contents.lightbulb == GeneralStatus.GOOD:
-        lightbulb = Messages.GeneralStatus.GeneralStatus().GOOD
-    else:
-        lightbulb = Messages.GeneralStatus.GeneralStatus().BAD
-
-    # Set dispenser status
-    if msg.contents.dispenser == DispenserStatus.OPTIMAL:
-        dispenser = Messages.DispenserStatus.DispenserStatus().OPTIMAL
-    elif msg.contents.dispenser == DispenserStatus.PARTIAL:
-        dispenser = Messages.DispenserStatus.DispenserStatus().PARTIAL
-    else:
-        dispenser = Messages.DispenserStatus.DispenserStatus().BLOCKAGE
-
-    # Set sensor status
-    if msg.contents.sensor_status == GeneralStatus.GOOD:
-        sensor_status = Messages.GeneralStatus.GeneralStatus().GOOD
-    else:
-        sensor_status = Messages.GeneralStatus.GeneralStatus().BAD
-
     # Build HealthContents
     Messages.HealthContents.HealthContentsStart(builder)
-    Messages.HealthContents.HealthContentsAddDispenser(builder, dispenser)
+    Messages.HealthContents.HealthContentsAddDispenser(builder, msg.contents.dispenser)
     Messages.HealthContents.AddIcemaker(builder, msg.contents.icemaker)
-    Messages.HealthContents.AddLightbulb(builder, lightbulb)
+    Messages.HealthContents.AddLightbulb(builder, msg.contents.lightbulb)
     Messages.HealthContents.AddFridgeTemp(builder, msg.contents.fridge_temp)
     Messages.HealthContents.AddFreezerTemp(builder, msg.contents.freezer_temp)
-    Messages.HealthContents.AddSensorStatus(builder, sensor_status)
+    Messages.HealthContents.AddSensorStatus(builder, msg.contents.sensor_status)
     contents = Messages.HealthContents.HealthContentsEnd(builder)
 
     # Build HealthMessage
@@ -202,7 +182,7 @@ def serialize_to_frames(cm):
     # We had to do it this way because the send_serialized method of zmq under the hood
     # relies on send_multipart, which needs a list or sequence of frames. The easiest way
     # to get an iterable out of the serialized buffer is to enclose it inside []
-    print("Serialize message to iterable list")
+    print("Serializing message to iterable list")
     return [serialize(cm)]
 
 def deserialize_order(buf):
@@ -250,12 +230,12 @@ def deserialize_health(buf):
     contents_packet = message_packet.Contents()
 
     message = HealthMessage()
-    message.contents.dispenser = contents_packet.Dispenser()
+    message.contents.dispenser = DispenserStatus(contents_packet.Dispenser())
     message.contents.icemaker = contents_packet.Icemaker()
-    message.contents.lightbulb = contents_packet.Lightbulb()
+    message.contents.lightbulb = GeneralStatus(contents_packet.Lightbulb())
     message.contents.fridge_temp = contents_packet.FridgeTemp()
     message.contents.freezer_temp = contents_packet.FreezerTemp()
-    message.contents.sensor_status = contents_packet.SensorStatus()
+    message.contents.sensor_status = GeneralStatus(contents_packet.SensorStatus())
 
     return message
 

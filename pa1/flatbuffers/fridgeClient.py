@@ -47,24 +47,36 @@ def driver(args):
 
     # create and send health message
     msg = HealthMessage()
-    print("created message {}".format(msg))
+    print("Created request:\n")
+    print(msg)
+    print()
     health_socket.send_serialized(msg, sz.serialize_to_frames)
     health_message = sz.deserialize_response(health_socket.recv())
-    print("received message {}".format(health_message))
+    print("Received response:\n")
+    print(health_message)
+    print()
 
     # create and send bad health message
     bad_msg = b'bad message'
-    print("created message {}".format(bad_msg))
+    print("Created request:\n")
+    print(bad_msg)
+    print()
     health_socket.send(bad_msg)
     bad_msg_resp = sz.deserialize_response(health_socket.recv())
-    print("received message {}".format(bad_msg_resp))
+    print("Received response:\n")
+    print(bad_msg_resp)
+    print()
 
     # create and send order message
-    msg = CreateOrder()
-    print("created message {}".format(msg))
+    msg = OrderMessage()
+    print("Created request:\n")
+    print(msg)
+    print()
     order_socket.send_serialized(msg, sz.serialize_to_frames)
     order_message = sz.deserialize_response(order_socket.recv())
-    print("received message {}".format(order_message))
+    print("Received response:\n")
+    print(order_message)
+    print()
 
     # since we are a client, we actively send something to the server
     # for i in range(args.iters):
@@ -97,14 +109,6 @@ def driver(args):
     #         health_socket.close()
     #         order_socket.close()
     #         return
-
-def CreateOrder():
-    # veggies = Veggies(0.2, 0.4)
-    # cans = Cans(1)
-    # bottles = Bottles(0)
-    # drinks = Drinks(cans, bottles)
-    # contents = OrderMessage.OrderContents(veggies, drinks, [], [], [])
-    return OrderMessage()
 
 ##################################
 # Command line parsing
