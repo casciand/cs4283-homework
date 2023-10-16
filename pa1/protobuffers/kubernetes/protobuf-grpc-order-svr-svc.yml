@@ -17,6 +17,7 @@ metadata:
   # give some name. Naming convention uses the following rules:
   # https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#rfc-1035-label-names
 #  namespace: dummy   # in this namespace (better to supply on cmd line as a parameter)
+  namespace: v1
   name:   protobuf-grpc-order-svr-svc # Because this is a service, K8s will change this to all caps attaching the IP addr and port of the corresponding deployment that clients can then use.
 spec:
   # Service accessible inside the cloud; hence ClusterIP
