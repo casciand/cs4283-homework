@@ -27,8 +27,8 @@ spec:
   ports:
     - name: protobuf-grpc-order-port    # not needed, but I have added this as we could access port via such a name
       protocol: TCP     # this is default (so not needed either)
-      port: 5577  # port to which external clients will make a request on
-      targetPort: 5577   # this is the port on which the pod/container is internally actually listening on, and so whenever a client request hits the port above, it will get forwarded to target port. If not specified, it is same as port.
+      port: 5578  # port to which external clients will make a request on
+      targetPort: 5578   # this is the port on which the pod/container is internally actually listening on, and so whenever a client request hits the port above, it will get forwarded to target port. If not specified, it is same as port.
 
 ...
 
