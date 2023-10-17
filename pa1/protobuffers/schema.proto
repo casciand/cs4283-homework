@@ -8,44 +8,57 @@ syntax = "proto3";
 
 package messages;
 
-enum DispenserStatus {
-  OPTIMAL = 0;
-  PARTIAL = 1;
-  BLOCKAGE = 2;
-}
-
 enum Status {
-  GOOD = 0;
-  BAD = 1;
-}
+      GOOD = 0;
+      BAD = 1;
+    }
 
 enum ResponseStatus {
   OK = 0;
   BAD_REQUEST = 1;
 }
 
-message HealthMessage {
-  optional DispenserStatus dispenser = 1;
-  optional uint32 icemaker = 2;
-  optional Status lightbulb = 3;
-  optional uint32 fridge_temp = 4;
-  optional uint32 freezer_temp = 5;
-  optional Status sensor_status = 6;
+message HealthContents {
+    enum DispenserStatus {
+      OPTIMAL = 0;
+      PARTIAL = 1;
+      BLOCKAGE = 2;
+    }
+
+    enum MotorStatus {
+      RUNNING = 0;
+      STOPPED = 1;
+    }
+
+    optional DispenserStatus dispenser = 1;
+    optional uint32 icemaker = 2;
+    optional Status lightbulb = 3;
+    optional uint32 fridge_temp = 4;
+    optional uint32 freezer_temp = 5;
+    optional Status sensor_status = 6;
+    optional MotorStatus motor_status = 7;
 }
 
 message OrderContents {
     message Veggies {
         optional float tomato = 1;
         optional float cucumber = 2;
+        optional float carrot = 3;
+        optional float broccoli = 4;
+        optional float asparagus = 5;
     }
 
     message Drinks {
         message Cans {
             optional int32 coke = 1;
+            optional int32 beer = 2;
+            optional int32 fanta = 3;
         }
 
         message Bottles {
             optional int32 sprite = 1;
+            optional int32 gingerale = 2;
+            optional int32 wine = 3;
         }
 
         optional Cans cans = 1;
@@ -95,6 +108,11 @@ message Order {
     optional OrderContents contents = 2;
 }
 
+message Health {
+    optional string type = 1;
+    optional HealthContents contents = 2;
+}
+
 // In our service, we do not expect anything coming back and so we declare an
 // empty response.
 message Response {
@@ -120,5 +138,5 @@ service OrderService
 
 service HealthService
 {
-    rpc method (HealthMessage) returns (Response) {};
+    rpc method (Health) returns (Response) {};
 }

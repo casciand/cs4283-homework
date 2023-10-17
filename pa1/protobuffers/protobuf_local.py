@@ -42,21 +42,29 @@ def main():
     print(deserialized)
 
     # Create health message
-    health_message = schema.HealthMessage(
-        dispenser=schema.DispenserStatus.OPTIMAL,
-        icemaker=2,
-        lightbulb=schema.Status.GOOD,
-        fridge_temp=45,
-        freezer_temp=10,
-        sensor_status=schema.Status.GOOD
-    )
+    health = schema.Health()
+    health.type = 'HEALTH'
+    health.contents.dispenser = health.contents.DispenserStatus.OPTIMAL
+    health.contents.icemaker = 2
+    health.contents.lightbulb = schema.Status.GOOD
+    health.contents.fridge_temp = 45
+    health.contents.freezer_temp = 10
+    health.contents.sensor_status = schema.Status.GOOD
+    health.contents.motor_status = health.contents.MotorStatus.RUNNING
 
-    serialized_data = health_message.SerializeToString()
-    print("Serialized Health Message: {}".format(serialized_data))
+    print("\nOriginal message:")
+    print(health)
 
-    deserialized_message = schema.HealthMessage()
-    deserialized_message.ParseFromString(serialized_data)
-    print("Deserialized Health Message: \n{}".format(deserialized_message))
+    # Serialize message
+    serialized = health.SerializeToString()
+    print("\nSerialized message:")
+    print(serialized)
+
+    # Deserialize message
+    deserialized = schema.Health()
+    deserialized.ParseFromString(serialized)
+    print("\nDeserialized message:")
+    print(deserialized)
 
 
 if __name__ == '__main__':
