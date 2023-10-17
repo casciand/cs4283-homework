@@ -1,13 +1,13 @@
 import time
-from messages import HealthMessage
+from messages import HealthMessage, OrderMessage
 import serialize as sz
 
 
 # DEMO: Serializes and deserializes a message
 def main():
     # cm = ResponseMessage(ResponseCode.OK, "Order Placed")
-    # cm = OrderMessage()
-    cm = HealthMessage()
+    cm = OrderMessage()
+    # cm = HealthMessage()
 
     print("Message contents before serialization:\n")
     print(cm)
@@ -26,7 +26,6 @@ def main():
 
     print("Message contents after serialization:\n")
     print(cm)
-
 
 if __name__ == '__main__':
     main()

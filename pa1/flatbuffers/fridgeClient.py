@@ -29,8 +29,8 @@ def driver(args):
 
     # connect sockets to servers
     try:
-        health_string = "tcp://" + args.addr + ":" + str(args.hport)
-        order_string = "tcp://" + args.addr + ":" + str(args.oport)
+        health_string = "tcp://" + args.health_addr + ":" + str(args.hport)
+        order_string = "tcp://" + args.order_addr + ":" + str(args.oport)
         health_socket.connect(health_string)
         order_socket.connect(order_string)
 
@@ -67,16 +67,16 @@ def driver(args):
     print(bad_msg_resp)
     print()
 
-    # create and send order message
-    msg = OrderMessage()
-    print("Created request:\n")
-    print(msg)
-    print()
-    order_socket.send_serialized(msg, sz.serialize_to_frames)
-    order_message = sz.deserialize_response(order_socket.recv())
-    print("Received response:\n")
-    print(order_message)
-    print()
+    # # create and send order message
+    # msg = OrderMessage()
+    # print("Created request:\n")
+    # print(msg)
+    # print()
+    # order_socket.send_serialized(msg, sz.serialize_to_frames)
+    # order_message = sz.deserialize_response(order_socket.recv())
+    # print("Received response:\n")
+    # print(order_message)
+    # print()
 
     # since we are a client, we actively send something to the server
     # for i in range(args.iters):
@@ -118,7 +118,9 @@ def parseCmdLineArgs():
     parser = argparse.ArgumentParser()
 
     # add optional arguments
-    parser.add_argument("-a", "--addr", default="127.0.0.1",
+    parser.add_argument("-a1", "--health_addr", default="127.0.0.1",
+                        help="IP Address to connect to (default: localhost i.e., 127.0.0.1)")
+    parser.add_argument("-a2", "--order_addr", default="127.0.0.1",
                         help="IP Address to connect to (default: localhost i.e., 127.0.0.1)")
     parser.add_argument("-i", "--iters", type=int, default=10, help="Number of iterations (default: 10")
     parser.add_argument("-p1", "--hport", type=int, default=5556,
