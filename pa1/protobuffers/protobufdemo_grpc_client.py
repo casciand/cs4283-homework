@@ -59,7 +59,7 @@ def create_order():
     meat.quantity = 3.89
     return order
 
-def driver(name, iters, vec_len, health_port, order_port):
+def driver(name, iters, vec_len, health_port, order_port, hip, oip):
     print(
         "Driver program: Name = {}, Num Iters = {}, Vector len = {}, Health port = {}, Order port = {}".format(name, iters, vec_len, health_port, order_port))
 
@@ -68,9 +68,11 @@ def driver(name, iters, vec_len, health_port, order_port):
     try:
 
         # Use the insecure channel to establish connection with server
-        print("Instantiate insecure channel")
-        health_channel = grpc.insecure_channel("localhost:" + str(health_port))
-        order_channel = grpc.insecure_channel("localhost:" + str(order_port))
+        hpath = "{}:{}".format(hip, str(health_port))
+        opath = "{}:{}".format(oip, str(order_port))
+        print("Instantiate insecure channel to {} and {}".format(hpath, opath))
+        health_channel = grpc.insecure_channel(hpath)
+        order_channel = grpc.insecure_channel(opath)
         print("Obtain a proxy object to the server")
         health_stub = spb_grpc.HealthServiceStub(health_channel)
         order_stub = spb_grpc.OrderServiceStub(order_channel)
@@ -156,7 +158,10 @@ def parseCmdLineArgs():
                         help="Port where the health server part of the peer listens and client side connects to (default: 5577)")
     parser.add_argument("-op", "--order_port", type=int, default=5578,
                         help="Port where the health server part of the peer listens and client side connects to (default: 5577)")
-
+    parser.add_argument("-hip", "--health_ip", type=str, default="localhost",
+                        help="ip address of health server container")
+    parser.add_argument("-oip", "--order_ip", type=str, default="localhost",
+                        help="ip address of order server container")
     # parse the args
     args = parser.parse_args()
 
@@ -174,7 +179,7 @@ def main():
     parsed_args = parseCmdLineArgs()
 
     # start the driver code
-    driver(parsed_args.name, parsed_args.iters, parsed_args.veclen, parsed_args.health_port, parsed_args.order_port)
+    driver(parsed_args.name, parsed_args.iters, parsed_args.veclen, parsed_args.health_port, parsed_args.order_port, parsed_args.health_ip, parsed_args.order_ip)
 
 
 # ----------------------------------------------
