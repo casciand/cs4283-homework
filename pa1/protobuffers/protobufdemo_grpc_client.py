@@ -40,8 +40,15 @@ def create_order():
 
     order.contents.veggies.tomato = 2.2
     order.contents.veggies.cucumber = 1.8
+    order.contents.veggies.carrot = 9.8
+    order.contents.veggies.broccoli = 3.8
+    order.contents.veggies.asparagus = 1.4
     order.contents.drinks.cans.coke = 2
+    order.contents.drinks.cans.beer = 3
+    order.contents.drinks.cans.fanta = 4
     order.contents.drinks.bottles.sprite = 1
+    order.contents.drinks.bottles.gingerale = 2
+    order.contents.drinks.bottles.wine = 3
 
     milk = order.contents.milk.add()
     milk.type = order.contents.Milk.WHOLE
@@ -77,66 +84,39 @@ def driver(name, iters, vec_len, health_port, order_port, hip, oip):
         health_stub = spb_grpc.HealthServiceStub(health_channel)
         order_stub = spb_grpc.OrderServiceStub(order_channel)
 
-        # now send the serialized custom message for the number of desired iterations
-        print("Allocate the Request object that we will then populate in every iteration")
-        health_mes = spb.HealthMessage(
-            dispenser=spb.DispenserStatus.OPTIMAL,
-            icemaker=2,
-            lightbulb=spb.Status.GOOD,
-            fridge_temp=45,
-            freezer_temp=10,
-            sensor_status=spb.Status.GOOD
-        )
+        for i in range(iters):
+            print(f'\n------Iteration {i + 1}------')
+            # now send the serialized custom message for the number of desired iterations
+            print("Allocate the Request object that we will then populate in every iteration")
+            health = spb.Health()
+            health.type = 'HEALTH'
+            health.contents.dispenser = health.contents.DispenserStatus.OPTIMAL
+            health.contents.icemaker = 2
+            health.contents.lightbulb = spb.Status.GOOD
+            health.contents.fridge_temp = 45
+            health.contents.freezer_temp = 10
+            health.contents.sensor_status = spb.Status.GOOD
+            health.contents.motor_status = health.contents.MotorStatus.RUNNING
 
-        order_mes = create_order()
+            order_mes = create_order()
 
-        print("Peer client sending the serialized health message")
-        start_time = time.time()
-        resp = health_stub.method(health_mes)
-        end_time = time.time()
-        print("sending/receiving took {} secs".format(end_time - start_time))
-        print("response: {}".format(resp))
+            print("Peer client sending the serialized health message")
+            start_time = time.time()
+            resp = health_stub.method(health)
+            end_time = time.time()
+            print("sending/receiving took {} secs".format(end_time - start_time))
+            print("response: {}".format(resp))
 
-        time.sleep(0.050)
+            time.sleep(1)
 
-        print("Peer client sending the serialized order message")
-        start_time = time.time()
-        resp = order_stub.method(order_mes)
-        end_time = time.time()
-        print("sending/receiving took {} secs".format(end_time - start_time))
-        print("response: {}".format(resp))
+            print("Peer client sending the serialized order message")
+            start_time = time.time()
+            resp = order_stub.method(order_mes)
+            end_time = time.time()
+            print("sending/receiving took {} secs".format(end_time - start_time))
+            print("response: {}".format(resp))
 
-        time.sleep(0.050)
-
-        # print("Peer client sending the serialized bad message")
-        # start_time = time.time()
-        # resp = order_stub.method("hello")
-        # end_time = time.time()
-        # print("sending/receiving took {} secs".format(end_time - start_time))
-        # print("response: {}".format(resp))
-
-
-        # req = spb.Request()
-        #
-        # for i in range(iters):
-        #     # for every iteration, let us fill up our custom message with some info
-        #     req.seq_no = i  # this will be our sequence number
-        #     req.ts = time.time()  # current time
-        #     req.name = name  # assigned name
-        #     req.data[:] = [random.randint(1, 1000) for j in range(vec_len)]
-        #     print("-----Iteration: {} contents of message before sending\n{} ----------".format(i, req))
-        #
-        #     # now let the client send the message to its server part
-        #     print("Peer client sending the serialized message")
-        #     start_time = time.time()
-        #     resp = stub.method(req)
-        #     end_time = time.time()
-        #     print("sending/receiving took {} secs".format(end_time - start_time))
-        #
-        #     # sleep a while before we send the next serialization so it is not
-        #     # extremely fast
-        #     time.sleep(0.050)  # 50 msec
-
+            time.sleep(5)
     except:
         print("Some exception occurred {}".format(sys.exc_info()[0]))
         return
@@ -150,7 +130,7 @@ def parseCmdLineArgs():
     parser = argparse.ArgumentParser()
 
     # add optional arguments
-    parser.add_argument("-i", "--iters", type=int, default=10, help="Number of iterations to run (default: 10)")
+    parser.add_argument("-i", "--iters", type=int, default=100, help="Number of iterations to run (default: 100)")
     parser.add_argument("-l", "--veclen", type=int, default=20,
                         help="Length of the vector field (default: 20; contents are irrelevant)")
     parser.add_argument("-n", "--name", default="ProtoBuf gRPC Demo", help="Name to include in each message")
