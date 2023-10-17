@@ -5,6 +5,8 @@ namespace Messages;
 // Enums
 enum DispenserStatus : byte { OPTIMAL, PARTIAL, BLOCKAGE }
 
+enum MotorStatus : byte { RUNNING, STOPPED }
+
 enum GeneralStatus : byte { GOOD, BAD }
 
 // Tables
@@ -16,6 +18,7 @@ table HealthContents
     fridge_temp: int;
     freezer_temp: int;
     sensor_status: GeneralStatus;
+    motor_status: MotorStatus;
 }
 
 table HealthMessage

@@ -31,8 +31,22 @@ class Bottles(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
+    # Bottles
+    def Gingerale(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
+    # Bottles
+    def Wine(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
 def BottlesStart(builder):
-    builder.StartObject(1)
+    builder.StartObject(3)
 
 def Start(builder):
     BottlesStart(builder)
@@ -42,6 +56,18 @@ def BottlesAddSprite(builder, sprite):
 
 def AddSprite(builder, sprite):
     BottlesAddSprite(builder, sprite)
+
+def BottlesAddGingerale(builder, gingerale):
+    builder.PrependInt32Slot(1, gingerale, 0)
+
+def AddGingerale(builder, gingerale):
+    BottlesAddGingerale(builder, gingerale)
+
+def BottlesAddWine(builder, wine):
+    builder.PrependInt32Slot(2, wine, 0)
+
+def AddWine(builder, wine):
+    BottlesAddWine(builder, wine)
 
 def BottlesEnd(builder):
     return builder.EndObject()

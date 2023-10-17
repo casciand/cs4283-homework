@@ -1,5 +1,5 @@
 import time
-from messages import HealthMessage, OrderMessage
+from messages import HealthMessage, OrderMessage, ResponseMessage, ResponseCode
 import serialize as sz
 
 
@@ -26,6 +26,7 @@ def main():
 
     print("Message contents after serialization:\n")
     print(cm)
+
 
 if __name__ == '__main__':
     main()

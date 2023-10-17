@@ -38,8 +38,29 @@ class Veggies(object):
             return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
+    # Veggies
+    def Carrot(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+    # Veggies
+    def Broccoli(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+    # Veggies
+    def Asparagus(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
 def VeggiesStart(builder):
-    builder.StartObject(2)
+    builder.StartObject(5)
 
 def Start(builder):
     VeggiesStart(builder)
@@ -55,6 +76,24 @@ def VeggiesAddCucumber(builder, cucumber):
 
 def AddCucumber(builder, cucumber):
     VeggiesAddCucumber(builder, cucumber)
+
+def VeggiesAddCarrot(builder, carrot):
+    builder.PrependFloat32Slot(2, carrot, 0.0)
+
+def AddCarrot(builder, carrot):
+    VeggiesAddCarrot(builder, carrot)
+
+def VeggiesAddBroccoli(builder, broccoli):
+    builder.PrependFloat32Slot(3, broccoli, 0.0)
+
+def AddBroccoli(builder, broccoli):
+    VeggiesAddBroccoli(builder, broccoli)
+
+def VeggiesAddAsparagus(builder, asparagus):
+    builder.PrependFloat32Slot(4, asparagus, 0.0)
+
+def AddAsparagus(builder, asparagus):
+    VeggiesAddAsparagus(builder, asparagus)
 
 def VeggiesEnd(builder):
     return builder.EndObject()

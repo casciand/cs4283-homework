@@ -14,9 +14,7 @@ import Messages.Code
 import Messages.Milk
 import Messages.Bread
 import Messages.Meat
-from messages import OrderMessage, HealthMessage, ResponseMessage, GeneralStatus, DispenserStatus, ResponseCode
 from messages import *
-
 
 
 def serialize_health(msg):
@@ -33,6 +31,7 @@ def serialize_health(msg):
     Messages.HealthContents.AddFridgeTemp(builder, msg.contents.fridge_temp)
     Messages.HealthContents.AddFreezerTemp(builder, msg.contents.freezer_temp)
     Messages.HealthContents.AddSensorStatus(builder, msg.contents.sensor_status)
+    Messages.HealthContents.AddMotorStatus(builder, msg.contents.motor_status)
     contents = Messages.HealthContents.HealthContentsEnd(builder)
 
     # Build HealthMessage
@@ -58,15 +57,22 @@ def serialize_order(msg):
     Messages.Veggies.Start(builder)
     Messages.Veggies.AddCucumber(builder, msg.contents.veggies.cucumber)
     Messages.Veggies.AddTomato(builder, msg.contents.veggies.tomato)
+    Messages.Veggies.AddCarrot(builder, msg.contents.veggies.carrot)
+    Messages.Veggies.AddBroccoli(builder, msg.contents.veggies.broccoli)
+    Messages.Veggies.AddAsparagus(builder, msg.contents.veggies.asparagus)
     veggies = Messages.Veggies.End(builder)
 
     # Serialize Drinks
     Messages.Cans.Start(builder)
     Messages.Cans.AddCoke(builder, msg.contents.drinks.cans.coke)
+    Messages.Cans.AddBeer(builder, msg.contents.drinks.cans.beer)
+    Messages.Cans.AddFanta(builder, msg.contents.drinks.cans.fanta)
     cans = Messages.Cans.End(builder)
 
     Messages.Bottles.Start(builder)
     Messages.Bottles.AddSprite(builder, msg.contents.drinks.bottles.sprite)
+    Messages.Bottles.AddGingerale(builder, msg.contents.drinks.bottles.gingerale)
+    Messages.Bottles.AddWine(builder, msg.contents.drinks.bottles.wine)
     bottles = Messages.Bottles.End(builder)
 
     Messages.Drinks.Start(builder)
@@ -191,14 +197,15 @@ def deserialize_order(buf):
 
     # Deserialize Veggies
     veggies_packet = contents_packet.Veggies()
-    veggies = Veggies(veggies_packet.Tomato(), veggies_packet.Cucumber())
+    veggies = Veggies(veggies_packet.Tomato(), veggies_packet.Cucumber(), veggies_packet.Carrot(),
+                      veggies_packet.Broccoli(), veggies_packet.Asparagus())
 
     # Deserialize Drinks
     drinks_packet = contents_packet.Drinks()
     cans_packet = drinks_packet.Cans()
-    cans = Cans(cans_packet.Coke())
+    cans = Cans(cans_packet.Coke(), cans_packet.Beer(), cans_packet.Fanta())
     bottles_packet = drinks_packet.Bottles()
-    bottles = Bottles(bottles_packet.Sprite())
+    bottles = Bottles(bottles_packet.Sprite(), bottles_packet.Gingerale(), bottles_packet.Wine())
     drinks = Drinks(cans, bottles)
 
     # Deserialize Milk
@@ -236,6 +243,7 @@ def deserialize_health(buf):
     message.contents.fridge_temp = contents_packet.FridgeTemp()
     message.contents.freezer_temp = contents_packet.FreezerTemp()
     message.contents.sensor_status = GeneralStatus(contents_packet.SensorStatus())
+    message.contents.motor_status = MotorStatus(contents_packet.MotorStatus())
 
     return message
 

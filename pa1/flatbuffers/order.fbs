@@ -22,16 +22,23 @@ table Veggies
 {
     tomato: float;
     cucumber: float;
+    carrot: float;
+    broccoli: float;
+    asparagus: float;
 }
 
 table Cans
 {
     coke: int;
+    beer: int;
+    fanta: int;
 }
 
 table Bottles
 {
     sprite: int;
+    gingerale: int;
+    wine: int;
 }
 
 table Milk

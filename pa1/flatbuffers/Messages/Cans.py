@@ -31,8 +31,22 @@ class Cans(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
+    # Cans
+    def Beer(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
+    # Cans
+    def Fanta(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
 def CansStart(builder):
-    builder.StartObject(1)
+    builder.StartObject(3)
 
 def Start(builder):
     CansStart(builder)
@@ -42,6 +56,18 @@ def CansAddCoke(builder, coke):
 
 def AddCoke(builder, coke):
     CansAddCoke(builder, coke)
+
+def CansAddBeer(builder, beer):
+    builder.PrependInt32Slot(1, beer, 0)
+
+def AddBeer(builder, beer):
+    CansAddBeer(builder, beer)
+
+def CansAddFanta(builder, fanta):
+    builder.PrependInt32Slot(2, fanta, 0)
+
+def AddFanta(builder, fanta):
+    CansAddFanta(builder, fanta)
 
 def CansEnd(builder):
     return builder.EndObject()
