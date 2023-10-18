@@ -60,7 +60,7 @@ def driver(args):
             continue
 
         #  Do some 'work'. In this case we just sleep.
-        time.sleep(1)
+        # time.sleep(1)
 
         try:
             #  Send reply back to client

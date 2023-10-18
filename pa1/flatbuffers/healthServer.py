@@ -60,7 +60,7 @@ def driver(args):
 
 
         #  Do some 'work'. In this case we just sleep.
-        time.sleep(1)
+        # time.sleep(1)
         # buf = socket.recv()
         # cm = sz.deserialize_from_frames(buf)
         # print("deserializing request {}".format(deserialized_message))

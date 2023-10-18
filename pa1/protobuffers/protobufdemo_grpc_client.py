@@ -84,6 +84,9 @@ def driver(name, iters, vec_len, health_port, order_port, hip, oip):
         health_stub = spb_grpc.HealthServiceStub(health_channel)
         order_stub = spb_grpc.OrderServiceStub(order_channel)
 
+        health_latencies = []
+        order_latencies = []
+
         for i in range(iters):
             print(f'\n------Iteration {i + 1}------')
             # now send the serialized custom message for the number of desired iterations
@@ -107,14 +110,13 @@ def driver(name, iters, vec_len, health_port, order_port, hip, oip):
             start_time = time.time()
             resp = health_stub.method(health)
             end_time = time.time()
-            print("sending/receiving took {} secs".format(end_time - start_time))
+            # print("sending/receiving took {} secs".format(end_time - start_time))
             # print("response: {}".format(resp))
+            health_latencies.append(round((end_time - start_time) * 1000, 3))
 
             print("Received response:\n")
             print(resp)
             print()
-
-            time.sleep(1)
 
             print("Created request:\n")
             print(order_mes)
@@ -124,16 +126,20 @@ def driver(name, iters, vec_len, health_port, order_port, hip, oip):
             start_time = time.time()
             resp = order_stub.method(order_mes)
             end_time = time.time()
-            print("sending/receiving took {} secs".format(end_time - start_time))
+            # print("sending/receiving took {} secs".format(end_time - start_time))
             # print("response: {}".format(resp))
+            order_latencies.append(round((end_time - start_time) * 1000, 3))
 
             print("Received response:\n")
             print(resp)
 
-            time.sleep(5)
+            time.sleep(0.1)
     except:
         print("Some exception occurred {}".format(sys.exc_info()[0]))
         return
+
+    print(f'Health latencies: {health_latencies}')
+    print(f'Order latencies: {order_latencies}')
 
 
 ##################################

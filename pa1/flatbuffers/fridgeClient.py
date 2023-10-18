@@ -46,6 +46,9 @@ def driver(args):
         order_socket.close()
         return
 
+    health_latencies = []
+    order_latencies = []
+
     for i in range(args.iters):
         print(f'\n------Iteration {i + 1}------')
         # create and send health message
@@ -53,69 +56,37 @@ def driver(args):
         print("Created request:\n")
         print(msg)
         print()
+
+        start_time = time.time()
         health_socket.send_serialized(msg, sz.serialize_to_frames)
         health_message = sz.deserialize_response(health_socket.recv())
+        end_time = time.time()
+
+        health_latencies.append(round((end_time - start_time) * 1000, 3))
+
         print("Received response:\n")
         print(health_message)
         print()
-
-        time.sleep(1)
-
-        # create and send bad health message
-        # bad_msg = b'bad message'
-        # print("Created request:\n")
-        # print(bad_msg)
-        # print()
-        # health_socket.send(bad_msg)
-        # bad_msg_resp = sz.deserialize_response(health_socket.recv())
-        # print("Received response:\n")
-        # print(bad_msg_resp)
-        # print()
 
         # create and send order message
         msg = OrderMessage()
         print("Created request:\n")
         print(msg)
         print()
+        start_time = time.time()
         order_socket.send_serialized(msg, sz.serialize_to_frames)
         order_message = sz.deserialize_response(order_socket.recv())
+        end_time = time.time()
         print("Received response:\n")
         print(order_message)
         print()
 
-        time.sleep(5)
+        order_latencies.append(round((end_time - start_time) * 1000, 3))
 
-    # since we are a client, we actively send something to the server
-    # for i in range(args.iters):
-    #     try:
-    #         health_socket.send(b"HelloWorld")
-    #         order_socket.send(b"HelloWorld")
-    #     except zmq.ZMQError as err:
-    #         print("ZeroMQ Error sending: {}".format(err))
-    #         health_socket.close()
-    #         order_socket.close()
-    #         return
-    #     except:
-    #         print("Some exception occurred receiving/sending {}".format(sys.exc_info()[0]))
-    #         health_socket.close()
-    #         order_socket.close()
-    #         return
-    #
-    #     try:
-    #         # receive a reply
-    #         health_message = health_socket.recv()
-    #         order_message = order_socket.recv()
-    #         print("Received replies in iteration {} is {} and {}".format(i, health_message, order_message))
-    #     except zmq.ZMQError as err:
-    #         print("ZeroMQ Error receiving: {}".format(err))
-    #         health_socket.close()
-    #         order_socket.close()
-    #         return
-    #     except:
-    #         print("Some exception occurred receiving/sending {}".format(sys.exc_info()[0]))
-    #         health_socket.close()
-    #         order_socket.close()
-    #         return
+        time.sleep(0.1)
+
+    print(f'Health latencies: {health_latencies}')
+    print(f'Order latencies: {order_latencies}')
 
 ##################################
 # Command line parsing
