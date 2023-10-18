@@ -1,0 +1,32 @@
+---
+# CS4383/5383: Computer Networks
+# Author: Aniruddha Gokhale
+# Created: Fall 2023
+#
+# This is a declarative approach to describe a Kubernetes based
+# job pod (job pods are typically used for a client like capability that runs once)
+
+# See https://kubernetes.io/docs/concepts/workloads/controllers/job/ for more details
+
+# We create a job pod for the client side functionality since
+# this is something that does its job and then terminates.
+# Since this is interactive code, we will be using the kubectl exec command
+# to "log into" the pod and then run the command manually. Otherwise, a
+# non interactive code can provide the command and args to run as shown
+# below. 
+
+apiVersion: batch/v1  # this is what K8s requires us to use
+kind: Job  # this is a job type pod
+metadata:
+  namespace: v1  # deploy in this namespace
+  name: flatbuf-zmq-client  # name of our job pod
+spec:
+  template:
+    spec:
+      containers:  # we are running one container inside this pod
+      - name: flatbuf-zmq-client-container
+        image: casciand/flatbuffers  # image from hub.docker
+        command: ["python3"]   # let us run the client code that pings the health and order servers
+        args: ["fridgeClient.py"]
+      restartPolicy: Never  # do not restart if the pod crashes
+  backoffLimit: 4  # indicates how many times to try creating
