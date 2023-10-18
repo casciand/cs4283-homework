@@ -107,7 +107,7 @@ class HealthServiceStub(object):
         """
         self.method = channel.unary_unary(
                 '/messages.HealthService/method',
-                request_serializer=schema__pb2.HealthMessage.SerializeToString,
+                request_serializer=schema__pb2.Health.SerializeToString,
                 response_deserializer=schema__pb2.Response.FromString,
                 )
 
@@ -126,7 +126,7 @@ def add_HealthServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'method': grpc.unary_unary_rpc_method_handler(
                     servicer.method,
-                    request_deserializer=schema__pb2.HealthMessage.FromString,
+                    request_deserializer=schema__pb2.Health.FromString,
                     response_serializer=schema__pb2.Response.SerializeToString,
             ),
     }
@@ -151,7 +151,7 @@ class HealthService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/messages.HealthService/method',
-            schema__pb2.HealthMessage.SerializeToString,
+            schema__pb2.Health.SerializeToString,
             schema__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -87,7 +87,6 @@ def driver(name, iters, vec_len, health_port, order_port, hip, oip):
         for i in range(iters):
             print(f'\n------Iteration {i + 1}------')
             # now send the serialized custom message for the number of desired iterations
-            print("Allocate the Request object that we will then populate in every iteration")
             health = spb.Health()
             health.type = 'HEALTH'
             health.contents.dispenser = health.contents.DispenserStatus.OPTIMAL
@@ -98,23 +97,38 @@ def driver(name, iters, vec_len, health_port, order_port, hip, oip):
             health.contents.sensor_status = spb.Status.GOOD
             health.contents.motor_status = health.contents.MotorStatus.RUNNING
 
+            print("Created request:\n")
+            print(health)
+            print()
+
             order_mes = create_order()
 
-            print("Peer client sending the serialized health message")
+            # print("Peer client sending the serialized health message")
             start_time = time.time()
             resp = health_stub.method(health)
             end_time = time.time()
             print("sending/receiving took {} secs".format(end_time - start_time))
-            print("response: {}".format(resp))
+            # print("response: {}".format(resp))
+
+            print("Received response:\n")
+            print(resp)
+            print()
 
             time.sleep(1)
 
-            print("Peer client sending the serialized order message")
+            print("Created request:\n")
+            print(order_mes)
+            print()
+
+            # print("Peer client sending the serialized order message")
             start_time = time.time()
             resp = order_stub.method(order_mes)
             end_time = time.time()
             print("sending/receiving took {} secs".format(end_time - start_time))
-            print("response: {}".format(resp))
+            # print("response: {}".format(resp))
+
+            print("Received response:\n")
+            print(resp)
 
             time.sleep(5)
     except:

@@ -1,6 +1,7 @@
 import argparse
 import sys
 import zmq
+import time
 from messages import HealthMessage, OrderMessage, Veggies, Bottles, Cans, Milk, Drinks
 import serialize as sz
 
@@ -45,38 +46,44 @@ def driver(args):
         order_socket.close()
         return
 
-    # create and send health message
-    msg = HealthMessage()
-    print("Created request:\n")
-    print(msg)
-    print()
-    health_socket.send_serialized(msg, sz.serialize_to_frames)
-    health_message = sz.deserialize_response(health_socket.recv())
-    print("Received response:\n")
-    print(health_message)
-    print()
+    for i in range(args.iters):
+        print(f'\n------Iteration {i + 1}------')
+        # create and send health message
+        msg = HealthMessage()
+        print("Created request:\n")
+        print(msg)
+        print()
+        health_socket.send_serialized(msg, sz.serialize_to_frames)
+        health_message = sz.deserialize_response(health_socket.recv())
+        print("Received response:\n")
+        print(health_message)
+        print()
 
-    # create and send bad health message
-    bad_msg = b'bad message'
-    print("Created request:\n")
-    print(bad_msg)
-    print()
-    health_socket.send(bad_msg)
-    bad_msg_resp = sz.deserialize_response(health_socket.recv())
-    print("Received response:\n")
-    print(bad_msg_resp)
-    print()
+        time.sleep(1)
 
-    # # create and send order message
-    # msg = OrderMessage()
-    # print("Created request:\n")
-    # print(msg)
-    # print()
-    # order_socket.send_serialized(msg, sz.serialize_to_frames)
-    # order_message = sz.deserialize_response(order_socket.recv())
-    # print("Received response:\n")
-    # print(order_message)
-    # print()
+        # create and send bad health message
+        # bad_msg = b'bad message'
+        # print("Created request:\n")
+        # print(bad_msg)
+        # print()
+        # health_socket.send(bad_msg)
+        # bad_msg_resp = sz.deserialize_response(health_socket.recv())
+        # print("Received response:\n")
+        # print(bad_msg_resp)
+        # print()
+
+        # create and send order message
+        msg = OrderMessage()
+        print("Created request:\n")
+        print(msg)
+        print()
+        order_socket.send_serialized(msg, sz.serialize_to_frames)
+        order_message = sz.deserialize_response(order_socket.recv())
+        print("Received response:\n")
+        print(order_message)
+        print()
+
+        time.sleep(5)
 
     # since we are a client, we actively send something to the server
     # for i in range(args.iters):
@@ -122,10 +129,10 @@ def parseCmdLineArgs():
                         help="IP Address to connect to (default: localhost i.e., 127.0.0.1)")
     parser.add_argument("-a2", "--order_addr", default="127.0.0.1",
                         help="IP Address to connect to (default: localhost i.e., 127.0.0.1)")
-    parser.add_argument("-i", "--iters", type=int, default=10, help="Number of iterations (default: 10")
-    parser.add_argument("-p1", "--hport", type=int, default=5556,
+    parser.add_argument("-i", "--iters", type=int, default=100, help="Number of iterations (default: 100")
+    parser.add_argument("-p1", "--hport", type=int, default=5577,
                         help="Health port that server is listening on (default: 5556)")
-    parser.add_argument("-p2", "--oport", type=int, default=5557,
+    parser.add_argument("-p2", "--oport", type=int, default=5578,
                         help="Order port that server is listening on (default: 5557)")
     args = parser.parse_args()
 

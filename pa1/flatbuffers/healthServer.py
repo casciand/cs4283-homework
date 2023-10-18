@@ -94,7 +94,7 @@ def parseCmdLineArgs():
 
     # add optional arguments
     parser.add_argument("-i", "--intf", default="*", help="Interface to bind to (default: *)")
-    parser.add_argument("-p", "--port", type=int, default=5556, help="Port to bind to (default: 5556)")
+    parser.add_argument("-p", "--port", type=int, default=5577, help="Port to bind to (default: 5556)")
     args = parser.parse_args()
 
     return args

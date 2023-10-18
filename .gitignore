@@ -2,5 +2,4 @@
 .DS_Store
 **/venv
 **/.idea
-pa1/flatbuffers/Messages/__pycache__/
-pa1/__pycache__/
+**/__pycache__/

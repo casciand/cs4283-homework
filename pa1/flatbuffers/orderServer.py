@@ -64,7 +64,7 @@ def driver(args):
 
         try:
             #  Send reply back to client
-            ack = messages.ResponseMessage(code=messages.ResponseCode.OK, contents="You are Healthy")
+            ack = messages.ResponseMessage(code=messages.ResponseCode.OK, contents="Order Placed")
             ack = sz.serialize(ack)
             socket.send(ack)
             print("Sent reply {}".format(ack))
@@ -87,7 +87,7 @@ def parseCmdLineArgs():
 
     # add optional arguments
     parser.add_argument("-i", "--intf", default="*", help="Interface to bind to (default: *)")
-    parser.add_argument("-p", "--port", type=int, default=5557, help="Port to bind to (default: 5557)")
+    parser.add_argument("-p", "--port", type=int, default=5578, help="Port to bind to (default: 5557)")
     args = parser.parse_args()
 
     return args
