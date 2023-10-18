@@ -135,11 +135,14 @@ def driver(name, iters, vec_len, health_port, order_port, hip, oip):
 
             time.sleep(0.1)
     except:
+        time.sleep(1000)
         print("Some exception occurred {}".format(sys.exc_info()[0]))
         return
 
     print(f'Health latencies: {health_latencies}')
     print(f'Order latencies: {order_latencies}')
+
+    time.sleep(1000)
 
 
 ##################################
