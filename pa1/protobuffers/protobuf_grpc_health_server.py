@@ -54,6 +54,7 @@ class ServiceHandler(spb_grpc.HealthServiceServicer):
         except:
             response = spb.Response(code=spb.ResponseStatus.BAD,
                                     contents="Bad Request")  #
+            return resp
             print("Some exception occurred handling method {}".format(sys.exc_info()[0]))
             raise
 
