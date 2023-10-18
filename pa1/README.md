@@ -14,6 +14,9 @@ YAML files are defined under the `v1` namespace.
 https://drive.google.com/file/d/1-4ggb23ZkSsbkNfrH5CMVyAZvlNrSXE3/view?usp=sharing
 
 ## Results
+<p>
+<img src="https://github.com/VUComputerNetworks/og_team15/blob/main/pa1/Latencies.png" alt="Latencies">
+</p>
 
 ## Teamwork
 
