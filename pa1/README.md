@@ -2,7 +2,7 @@
 
 ## Run
 
-YAML files are defined under the `v1` namespace.
+YAML files are defined under the `v1` namespace
 
 1. Install and configure Docker and Kubernetes.
 2. Create clusters using `start_k8s.sh`.
