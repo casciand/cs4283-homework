@@ -19,3 +19,6 @@ Andrew: Set up vxlan. Created Mininet topology to achieve full connectivity on V
 Kev: Worked on Mininet topologies for VM1 and VM2. 
 
 Binh: Worked on Mininet topologies for VM1/VM2.
+
+## Latency Graph
+![Latency Graph](latency_graph.png)
