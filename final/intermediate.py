@@ -1,37 +1,45 @@
 import argparse
+import socket
 import sys
 import time
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
-import zmq
+# import zmq
 
 
 def driver(args):
-    try:
-        context = zmq.Context()
-    except zmq.ZMQError as err:
-        print("ZeroMQ Error obtaining context: {}".format(err))
-        return
-    except:
-        print("Some exception occurred getting context {}".format(sys.exc_info()[0]))
-        return
+    # try:
+    #     context = zmq.Context()
+    # except zmq.ZMQError as err:
+    #     print("ZeroMQ Error obtaining context: {}".format(err))
+    #     return
+    # except:
+    #     print("Some exception occurred getting context {}".format(sys.exc_info()[0]))
+    #     return
+    #
+    # # Create socket
+    # try:
+    #     socket = context.socket(zmq.REP)
+    #     connection_addr = "tcp://" + args.intf + ":" + str(args.port)
+    #     socket.bind(connection_addr)
+    # except zmq.ZMQError as err:
+    #     print("ZeroMQ Error obtaining REP socket: {}".format(err))
+    #     return
+    # except:
+    #     print("Some exception occurred getting REP socket {}".format(sys.exc_info()[0]))
+    #     return
 
-    # Create socket
-    try:
-        socket = context.socket(zmq.REP)
-        connection_addr = "tcp://" + args.intf + ":" + str(args.port)
-        socket.bind(connection_addr)
-    except zmq.ZMQError as err:
-        print("ZeroMQ Error obtaining REP socket: {}".format(err))
-        return
-    except:
-        print("Some exception occurred getting REP socket {}".format(sys.exc_info()[0]))
-        return
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(("localhost", int(args.port)))
+
+    server_socket.listen(1)
+    client_socket, client_address = server_socket.accept()
+    print(f'Connection established with {client_address}')
 
     # Receive client RSA public key
-    pem = socket.recv()
+    pem = client_socket.recv(1024)
     print('Received RSA public key from client')
     public_key = serialization.load_pem_public_key(pem)
 
@@ -45,11 +53,11 @@ def driver(args):
             label=None
         )
     )
-    socket.send(encrypted_symmetric_key)
+    client_socket.sendall(encrypted_symmetric_key)
     print('Sent encrypted symmetric key:', encrypted_symmetric_key)
 
     # Decrypt ciphertext
-    ciphertext = socket.recv()
+    ciphertext = client_socket.recv(1024)
     print('Received ciphertext:', ciphertext)
     f = Fernet(symmetric_key)
     plaintext = f.decrypt(ciphertext)

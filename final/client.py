@@ -1,34 +1,38 @@
 import argparse
+import socket
 import sys
 import time
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
-import zmq
+# import zmq
 
 
 def driver(args):
-    try:
-        context = zmq.Context()
-    except zmq.ZMQError as err:
-        print("ZeroMQ Error: {}".format(err))
-        return
-    except:
-        print("Some exception occurred getting context {}".format(sys.exc_info()[0]))
-        return
+    # try:
+    #     context = zmq.Context()
+    # except zmq.ZMQError as err:
+    #     print("ZeroMQ Error: {}".format(err))
+    #     return
+    # except:
+    #     print("Some exception occurred getting context {}".format(sys.exc_info()[0]))
+    #     return
+    #
+    # # Create socket
+    # try:
+    #     socket = context.socket(zmq.REQ)
+    #     connection_addr = "tcp://" + args.addr + ":" + str(args.port)
+    #     socket.connect(connection_addr)
+    # except zmq.ZMQError as err:
+    #     print("ZeroMQ Error obtaining context: {}".format(err))
+    #     return
+    # except:
+    #     print("Some exception occurred getting REQ socket {}".format(sys.exc_info()[0]))
+    #     return
 
-    # Create socket
-    try:
-        socket = context.socket(zmq.REQ)
-        connection_addr = "tcp://" + args.addr + ":" + str(args.port)
-        socket.connect(connection_addr)
-    except zmq.ZMQError as err:
-        print("ZeroMQ Error obtaining context: {}".format(err))
-        return
-    except:
-        print("Some exception occurred getting REQ socket {}".format(sys.exc_info()[0]))
-        return
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(("localhost", int(args.port)))
 
     # Generate RSA keys
     private_key = rsa.generate_private_key(
@@ -42,11 +46,11 @@ def driver(args):
     )
 
     # Send RSA public key
-    socket.send(pem)
+    client_socket.sendall(pem)
     print('Sent RSA public key')
 
     #  Receive Fernet (symmetric) key
-    encrypted_symmetric_key = socket.recv()
+    encrypted_symmetric_key = client_socket.recv(1024)
     print('Received key:', encrypted_symmetric_key)
     symmetric_key = private_key.decrypt(
         encrypted_symmetric_key,
@@ -63,7 +67,7 @@ def driver(args):
     print('Plaintext:', plaintext)
     f = Fernet(symmetric_key)
     ciphertext = f.encrypt(plaintext)
-    socket.send(ciphertext)
+    client_socket.sendall(ciphertext)
     print('Sent ciphertext:', ciphertext)
 
 
