@@ -8,8 +8,6 @@ from mininet.cli import CLI
 
 
 class LinuxRouter(Node):
-    "A Node with IP forwarding enabled."
-
     def config(self, **params):
         super(LinuxRouter, self).config(**params)
         self.cmd('sysctl net.ipv4.ip_forward=1')
@@ -21,28 +19,47 @@ class LinuxRouter(Node):
 
 class NetworkTopo(Topo):
     def build(self, **_opts):
-        h1 = self.addHost('h1')
-        h2 = self.addHost('h2')
-        h3 = self.addHost('h3')
-        h4 = self.addHost('h4')
+        num_intermediates = _opts[0]
 
-        s1 = self.addSwitch('s1')
-        s2 = self.addSwitch('s2')
+        # Initialize client
+        client = self.addHost('h1')
+        prev_switch = self.addSwitch('s1')
+        self.addLink(client, s1)
 
-        self.addLink(h1, s1)
-        self.addLink(h2, s1)
-        self.addLink(h3, s2)
-        self.addLink(h4, s2)
-        self.addLink(s1, s2)
+        # Initialize intermediate nodes
+        for i in range(num_intermediates):
+            host = self.addHost(f'h{i + 2}')
+            switch = self.addSwitch(f's{i + 2}')
+            self.addLink(host, switch)
+            self.addLink(prev_switch, switch)
+            prev_switch = switch
+
+        # Initialize server
+        server = self.addHost(f'h{num_intermediates + 2}')
+        switch = self.addSwitch(f's{num_intermediates + 2}')
+        self.addLink(server, switch)
+        self.addLink(prev_switch, switch)
 
 
-def run():
-    topo = NetworkTopo()
+def parse_args():
+    # Parse the command line
+    parser = argparse.ArgumentParser()
+
+    # Add optional arguments
+    parser.add_argument("-n", "--hosts", type=int, default=3,
+                        help="Number of intermediate hosts (default: 3)")
+    args = parser.parse_args()
+
+    return args
+
+
+def run(args):
+    topo = NetworkTopo(args.hosts)
     net = Mininet(topo=topo)
     net.start()
 
-    net['h2'].cmd('python3 intermediate.py > h2_output.txt &')
-    net['h1'].cmd('python3 client.py > h1_output.txt &')
+    # net['h2'].cmd('python3 intermediate.py > h2_output.txt &')
+    # net['h1'].cmd('python3 client.py > h1_output.txt &')
 
     CLI(net)
     net.stop()
@@ -50,4 +67,5 @@ def run():
 
 if __name__ == '__main__':
     setLogLevel('info')
-    run()
+    parsed_args = parse_args()
+    run(parsed_args)
