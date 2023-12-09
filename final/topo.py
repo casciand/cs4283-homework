@@ -48,7 +48,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     # Add optional arguments
-    parser.add_argument("-h", "--hosts", type=int, default=3,
+    parser.add_argument("-n", "--hosts", type=int, default=3,
                         help="Number of intermediate hosts (default: 3)")
     args = parser.parse_args()
 
@@ -68,7 +68,7 @@ def run():
     for i in range(num_intermediates):
         net[f'h{i + 2}'].cmd(f'python3 intermediate.py -a 10.0.0.{i + 2} > h{i + 2}_output.txt &')
 
-    net['h1'].cmd(f'python3 client.py -h {num_intermediates} > client_output.txt &')
+    net['h1'].cmd(f'python3 client.py -n {num_intermediates} > client_output.txt &')
 
     CLI(net)
     net.stop()

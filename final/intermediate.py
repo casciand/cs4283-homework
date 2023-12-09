@@ -9,10 +9,13 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
 
 def driver(args):
+    host_num = int(args.addr[-1])
+
+    print('---------- Key Exchange ----------\n')
+
     print('Binding socket...')
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((args.addr, int(args.port)))
-    print('Binded!')
 
     print('Listening for connections...')
     server_socket.listen(1)
@@ -21,7 +24,7 @@ def driver(args):
 
     # Receive client RSA public key
     pem = client_socket.recv(1024)
-    print('Received RSA public key from client')
+    print('Received RSA public key!')
     public_key = serialization.load_pem_public_key(pem)
 
     #  Generate Fernet (symmetric) key
@@ -37,12 +40,39 @@ def driver(args):
     client_socket.sendall(encrypted_symmetric_key)
     print('Sent encrypted symmetric key:', encrypted_symmetric_key)
 
-    # Decrypt ciphertext
-    ciphertext = client_socket.recv(1024)
-    print('Received ciphertext:', ciphertext)
+    print('---------- Unwrapping the Onion ----------\n')
+
+    # Close sockets
+    client_socket.close()
+    server_socket.close()
+
+    # Establish connection with previous node
+    print('Binding socket...')
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((args.addr, int(args.port)))
+
+    print('Listening for connections...')
+    server_socket.listen(1)
+    prev_socket, prev_address = server_socket.accept()
+    print(f'Connection established with {prev_address}')
+
+    # Receive and decrypt single layer of encryption
+    ciphertext = prev_socket.recv(1024)
+    print('Received wrapped ciphertext:', ciphertext)
     f = Fernet(symmetric_key)
-    plaintext = f.decrypt(ciphertext)
-    print('Decrypted message:', plaintext)
+    message = f.decrypt(ciphertext)
+    print('Decrypted single layer:', message)
+
+    # Establish connection with next node
+    print('\nConnecting socket...')
+    next_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    next_socket.connect((f'10.0.0.{host_num + 1}', int(args.port)))
+
+    next_socket.sendall(message)
+
+    server_socket.close()
+    prev_socket.close()
+    next_socket.close()
 
 
 def parse_args():

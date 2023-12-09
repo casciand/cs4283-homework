@@ -9,15 +9,18 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
 
 def driver(args):
-    for i in args.hosts:
-        print(f'----------Intermediate {i + 1} ----------')
+    symmetric_keys = []
+    entry_node_addr = '10.0.0.2'
+
+    for i in range(args.hosts):
+        print(f'---------- Intermediate {i + 1} ----------\n')
 
         print('Connecting socket...')
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((f'10.0.0.{i + 2}', int(args.port)))
-        print('Connected!')
 
         # Generate RSA keys
+        print('Generating new RSA key pair...')
         private_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048,
@@ -30,11 +33,11 @@ def driver(args):
 
         # Send RSA public key
         client_socket.sendall(pem)
-        print('Sent RSA public key')
+        print('Sent RSA public key!')
 
         #  Receive Fernet (symmetric) key
         encrypted_symmetric_key = client_socket.recv(1024)
-        print('Received key:', encrypted_symmetric_key)
+        print('Received encrypted Fernet key:', encrypted_symmetric_key)
         symmetric_key = private_key.decrypt(
             encrypted_symmetric_key,
             padding.OAEP(
@@ -43,17 +46,33 @@ def driver(args):
                 label=None
             )
         )
-        print('Decrypted symmetric key:', symmetric_key)
-
-        # Encrypt message
-        plaintext = b'SECRET MESSAGE'
-        print('Plaintext:', plaintext)
-        f = Fernet(symmetric_key)
-        ciphertext = f.encrypt(plaintext)
-        client_socket.sendall(ciphertext)
-        print('Sent ciphertext:', ciphertext)
+        symmetric_keys.append(symmetric_key)
+        print('Decrypted Fernet key:', symmetric_key)
+        print()
 
         client_socket.close()
+
+    print('---------- Wrapping the Onion ----------\n')
+
+    # Encrypt message
+    message = b'SECRET MESSAGE'
+    print('Plaintext:', plaintext)
+
+    for i, key in enumerate(reversed(symmetric_keys)):
+        f = Fernet(key)
+        message = f.encrypt(message)
+        print(f'Encrypted Message (Layer {i + 1}):', message)
+
+    # Establish connection with entry host
+    print('\nConnecting socket...')
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((entry_node_addr, int(args.port)))
+
+    # Send wrapped message
+    client_socket.sendall(message)
+    print(f'Sent wrapped message to {entry_node_addr} (with {args.hosts} layers of encryption!)')
+
+    client_socket.close()
 
 
 def parse_args():
