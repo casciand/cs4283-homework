@@ -1,10 +1,13 @@
 #!/usr/bin/python
+import argparse
 
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.node import Node, OVSSwitch
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
+
+global parsed_args
 
 
 class LinuxRouter(Node):
@@ -19,7 +22,7 @@ class LinuxRouter(Node):
 
 class NetworkTopo(Topo):
     def build(self, **_opts):
-        num_intermediates = _opts[0]
+        num_intermediates = parsed_args.hosts
 
         # Initialize client
         client = self.addHost('h1')
@@ -53,8 +56,11 @@ def parse_args():
     return args
 
 
-def run(args):
-    topo = NetworkTopo(args.hosts)
+def run():
+    global parsed_args
+    parsed_args = parse_args()
+
+    topo = NetworkTopo()
     net = Mininet(topo=topo)
     net.start()
 
@@ -67,5 +73,4 @@ def run(args):
 
 if __name__ == '__main__':
     setLogLevel('info')
-    parsed_args = parse_args()
-    run(parsed_args)
+    run()
