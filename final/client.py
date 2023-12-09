@@ -72,10 +72,10 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     # add optional arguments
-    parser.add_argument("-a", "--addr", default="127.0.0.1",
+    parser.add_argument("-a", "--addr", default="10.0.0.2",
                         help="IP Address to connect to (default: localhost i.e., 127.0.0.1)")
     parser.add_argument("-p", "--port", type=int, default=5556,
-                        help="Health port that server is listening on (default: 5556)")
+                        help="Port that server is listening on (default: 5556)")
     args = parser.parse_args()
 
     return args

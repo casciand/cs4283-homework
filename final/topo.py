@@ -21,25 +21,28 @@ class LinuxRouter(Node):
 
 class NetworkTopo(Topo):
     def build(self, **_opts):
-        r1 = self.addHost('r1', cls=LinuxRouter, ip='10.0.0.10/24')
+        h1 = self.addHost('h1')
+        h2 = self.addHost('h2')
+        h3 = self.addHost('h3')
+        h4 = self.addHost('h4')
 
         s1 = self.addSwitch('s1')
         s2 = self.addSwitch('s2')
 
-        self.addLink(s1, r1, intfName2='r1-eth1', params2={'ip': '10.0.0.10/24'})
-        self.addLink(s2, r1, intfName2='r1-eth2', params2={'ip': '10.0.0.10/24'})
-
-        h1 = self.addHost('h1', ip='10.0.0.1/24', defaultRoute='via 10.0.0.10')
-        h2 = self.addHost('h2', ip='10.0.0.2/24', defaultRoute='via 10.0.0.10')
-
         self.addLink(h1, s1)
-        self.addLink(h2, s2)
+        self.addLink(h2, s1)
+        self.addLink(h3, s2)
+        self.addLink(h4, s2)
+        self.addLink(s1, s2)
 
 
 def run():
     topo = NetworkTopo()
     net = Mininet(topo=topo)
     net.start()
+
+    net['h2'].cmd('python3 intermediate.py > h2_output.txt &')
+    net['h1'].cmd('python3 client.py > h1_output.txt &')
 
     CLI(net)
     net.stop()
