@@ -79,10 +79,11 @@ def driver(args):
     next_socket.connect((next_node_addr, int(args.port)))
 
     try:
-        size = bytes(str(len(message)), 'utf-8')
-        print(size)
+        size = str(len(message))
+        size = '0' * (4 - len(size)) + size
+        size = bytes(size, 'utf-8')
         next_socket.sendall(size)
-        time.sleep(0.1)
+        # time.sleep(0.1)
         next_socket.sendall(message)
     except err:
         print(err)
@@ -108,9 +109,11 @@ def driver(args):
     print('Added single layer of encryption:', response)
 
     try:
-        size = bytes(str(len(response)), 'utf-8')
+        size = str(len(response))
+        size = '0' * (4 - len(size)) + size
+        size = bytes(size, 'utf-8')
         prev_socket.sendall(size)
-        time.sleep(0.1)
+        # time.sleep(0.1)
         prev_socket.sendall(response)
     except err:
         print(err)

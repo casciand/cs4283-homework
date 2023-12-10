@@ -33,9 +33,11 @@ def driver(args):
     response = b'SECRET RESPONSE'
 
     try:
-        size = bytes(str(len(response)), 'utf-8')
+        size = str(len(response))
+        size = '0' * (4 - len(size)) + size
+        size = bytes(size, 'utf-8')
         prev_socket.sendall(size)
-        time.sleep(0.1)
+        # time.sleep(0.1)
         prev_socket.sendall(response)
     except err:
         print(err)

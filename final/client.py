@@ -75,9 +75,11 @@ def driver(args):
 
     # Send wrapped message
     try:
-        size = bytes(str(len(message)), 'utf-8')
+        size = str(len(message))
+        size = '0' * (4 - len(size)) + size
+        size = bytes(size, 'utf-8')
         client_socket.sendall(size)
-        time.sleep(0.1)
+        # time.sleep(0.1)
         client_socket.sendall(message)
     except err:
         print(err)
