@@ -64,10 +64,11 @@ def run():
     net = Mininet(topo=topo)
     net.start()
 
-    # Public key exchange
+    # Public key exchange and message traversal
     for i in range(num_intermediates):
         net[f'h{i + 2}'].cmd(f'python3 intermediate.py -a 10.0.0.{i + 2} > h{i + 2}_output.txt &')
 
+    net[f'h{num_intermediates + 2}'].cmd(f'python3 server.py -a 10.0.0.{num_intermediates + 2} > server_output.txt &')
     net['h1'].cmd(f'python3 client.py -n {num_intermediates} > client_output.txt &')
 
     CLI(net)

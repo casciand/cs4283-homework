@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
 
 def driver(args):
-    host_num = int(args.addr[-1])
+    next_node_addr = f'10.0.0.{args.addr[-1] + 1}'
 
     print('---------- Key Exchange ----------\n')
 
@@ -39,6 +39,7 @@ def driver(args):
     )
     client_socket.sendall(encrypted_symmetric_key)
     print('Sent encrypted symmetric key:', encrypted_symmetric_key)
+    print()
 
     print('---------- Unwrapping the Onion ----------\n')
 
@@ -66,9 +67,22 @@ def driver(args):
     # Establish connection with next node
     print('\nConnecting socket...')
     next_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    next_socket.connect((f'10.0.0.{host_num + 1}', int(args.port)))
+    next_socket.connect((next_node_addr, int(args.port)))
 
     next_socket.sendall(message)
+    print(f'Forwarded message to next node at {next_node_addr}')
+    print()
+
+    print('---------- Unwrapping the Onion ----------\n')
+
+    # Receive response form next node
+    response = next_socket.recv(1024)
+    print('Received response:', response)
+    response = f.encrypt(response)
+    print('Added single layer of encryption:', response)
+
+    prev_socket.sendall(response)
+    print(f'Forwarded response to prev node at {prev_address[0]}')
 
     server_socket.close()
     prev_socket.close()

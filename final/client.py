@@ -56,7 +56,7 @@ def driver(args):
 
     # Encrypt message
     message = b'SECRET MESSAGE'
-    print('Plaintext:', plaintext)
+    print('Plaintext:', message)
 
     for i, key in enumerate(reversed(symmetric_keys)):
         f = Fernet(key)
@@ -71,6 +71,16 @@ def driver(args):
     # Send wrapped message
     client_socket.sendall(message)
     print(f'Sent wrapped message to {entry_node_addr} (with {args.hosts} layers of encryption!)')
+
+    # Receive wrapped response
+    response = client_socket.recv(1024)
+    print('Received wrapped response:', response)
+
+    # Unwrap the onion
+    for i, key in enumerate(symmetric_keys):
+        f = Fernet(key)
+        response = f.decrypt(response)
+        print(f'Decrypted Response (Layer {i + 1}):', response)
 
     client_socket.close()
 
