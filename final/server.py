@@ -5,7 +5,7 @@ import time
 
 
 def driver(args):
-    packet_size = 16384
+    packet_size = 1024
 
     # Establish connection with previous node
     print('Binding socket...')
@@ -18,11 +18,28 @@ def driver(args):
     print(f'Connection established with {prev_address}')
 
     # Receive and send response
-    message = prev_socket.recv(packet_size)
+    message_size = prev_socket.recv(packet_size).decode('utf-8')
+    message_size = int(message_size)
+
+    message = prev_socket.recv(message_size)
+    recv_length = len(message)
+    while message_size - recv_length > 0:
+        message += prev_socket.recv(message_size - recv_length)
+        recv_length = len(message)
+
+    # message = prev_socket.recv(packet_size)
     print('Received decrypted message:', message)
 
     response = b'SECRET RESPONSE'
-    prev_socket.sendall(response)
+
+    try:
+        size = bytes(str(len(response)), 'utf-8')
+        prev_socket.sendall(size)
+        prev_socket.sendall(response)
+    except err:
+        print(err)
+
+    # prev_socket.sendall(response)
     print(f'Sent unencrypted response to exit node at {prev_address[0]}')
 
     server_socket.close()

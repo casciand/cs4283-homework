@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
 def driver(args):
     next_node_addr = f'10.0.0.{int(args.addr[-1]) + 1}'
-    packet_size = 16384
+    packet_size = 1024
 
     print('---------- Key Exchange ----------\n')
 
@@ -59,11 +59,7 @@ def driver(args):
     print(f'Connection established with {prev_address}')
 
     # Receive and decrypt single layer of encryption
-    message_size = ''
-    curr = prev_socket.recv(1)
-    while curr != '\n':
-        message_size += str(curr)
-        curr = prev_socket.recv(1)
+    message_size = prev_socket.recv(packet_size).decode('utf-8')
     message_size = int(message_size)
 
     ciphertext = prev_socket.recv(message_size)
@@ -82,18 +78,40 @@ def driver(args):
     next_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     next_socket.connect((next_node_addr, int(args.port)))
 
-    next_socket.sendall(message)
+    try:
+        size = bytes(str(len(message)), 'utf-8')
+        next_socket.sendall(size)
+        next_socket.sendall(message)
+    except err:
+        print(err)
+
     print(f'Forwarded message to next node at {next_node_addr}\n')
 
     print('---------- Wrapping the Onion ----------\n')
 
     # Receive response form next node
-    response = next_socket.recv(packet_size)
+    message_size = next_socket.recv(packet_size).decode('utf-8')
+    message_size = int(message_size)
+
+    response = prev_socket.recv(message_size)
+    recv_length = len(response)
+    while message_size - recv_length > 0:
+        response += prev_socket.recv(message_size - recv_length)
+        recv_length = len(response)
+
+    # response = next_socket.recv(packet_size)
     print('Received response:', response)
     response = f.encrypt(response)
     print('Added single layer of encryption:', response)
 
-    prev_socket.sendall(response)
+    try:
+        size = bytes(str(len(response)), 'utf-8')
+        prev_socket.sendall(size)
+        prev_socket.sendall(response)
+    except err:
+        print(err)
+
+    # prev_socket.sendall(response)
     print(f'Forwarded response to prev node at {prev_address[0]}')
 
     server_socket.close()

@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 def driver(args):
     symmetric_keys = []
     entry_node_addr = '10.0.0.2'
-    packet_size = 16384
+    packet_size = 1024
 
     start_time_1 = time.time()
 
@@ -74,15 +74,28 @@ def driver(args):
     client_socket.connect((entry_node_addr, int(args.port)))
 
     # Send wrapped message
-    size = bytes(str(len(message)), 'utf-8')
-    client_socket.sendall(size)
-    client_socket.sendall(message)
+    try:
+        size = bytes(str(len(message)), 'utf-8')
+        client_socket.sendall(size)
+        client_socket.sendall(message)
+    except err:
+        print(err)
+
     print(f'Sent wrapped message to {entry_node_addr} (with {args.hosts} layers of encryption!)\n')
 
     print('---------- Unwrapping the Onion ----------\n')
 
     # Receive wrapped response
-    response = client_socket.recv(packet_size)
+    message_size = client_socket.recv(packet_size).decode('utf-8')
+    message_size = int(message_size)
+
+    response = client_socket.recv(message_size)
+    recv_length = len(response)
+    while message_size - recv_length > 0:
+        response += client_socket.recv(message_size - recv_length)
+        recv_length = len(response)
+
+    # response = client_socket.recv(packet_size)
     print('Received wrapped response:', response)
 
     # Unwrap the onion
