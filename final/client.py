@@ -74,7 +74,8 @@ def driver(args):
     client_socket.connect((entry_node_addr, int(args.port)))
 
     # Send wrapped message
-    message = len(message) + '\n' + message
+    size = bytes(str(len(message)), 'utf-8')
+    client_socket.sendall(size)
     client_socket.sendall(message)
     print(f'Sent wrapped message to {entry_node_addr} (with {args.hosts} layers of encryption!)\n')
 

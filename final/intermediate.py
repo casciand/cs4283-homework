@@ -42,11 +42,11 @@ def driver(args):
     print('Sent encrypted symmetric key:', encrypted_symmetric_key)
     print()
 
-    print('---------- Unwrapping the Onion ----------\n')
-
     # Close sockets
     client_socket.close()
     server_socket.close()
+
+    print('---------- Unwrapping the Onion ----------\n')
 
     # Establish connection with previous node
     print('Binding socket...')
@@ -62,7 +62,7 @@ def driver(args):
     message_size = ''
     curr = prev_socket.recv(1)
     while curr != '\n':
-        message_size += curr
+        message_size += str(curr)
         curr = prev_socket.recv(1)
     message_size = int(message_size)
 
