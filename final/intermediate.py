@@ -59,7 +59,7 @@ def driver(args):
     print(f'Connection established with {prev_address}')
 
     # Receive and decrypt single layer of encryption
-    message_size = prev_socket.recv(packet_size).decode('utf-8')
+    message_size = prev_socket.recv(4).decode('utf-8')
     message_size = int(message_size)
 
     ciphertext = prev_socket.recv(message_size)
@@ -89,14 +89,15 @@ def driver(args):
 
     print('---------- Wrapping the Onion ----------\n')
 
-    # Receive response form next node
-    message_size = next_socket.recv(packet_size).decode('utf-8')
+    # Receive response from next node
+    message_size = next_socket.recv(4).decode('utf-8')
+    print(message_size)
     message_size = int(message_size)
 
-    response = prev_socket.recv(message_size)
+    response = next_socket.recv(message_size)
     recv_length = len(response)
     while message_size - recv_length > 0:
-        response += prev_socket.recv(message_size - recv_length)
+        response += next_socket.recv(message_size - recv_length)
         recv_length = len(response)
 
     # response = next_socket.recv(packet_size)

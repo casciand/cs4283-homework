@@ -18,7 +18,7 @@ def driver(args):
     print(f'Connection established with {prev_address}')
 
     # Receive and send response
-    message_size = prev_socket.recv(packet_size).decode('utf-8')
+    message_size = prev_socket.recv(4).decode('utf-8')
     message_size = int(message_size)
 
     message = prev_socket.recv(message_size)

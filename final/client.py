@@ -86,7 +86,7 @@ def driver(args):
     print('---------- Unwrapping the Onion ----------\n')
 
     # Receive wrapped response
-    message_size = client_socket.recv(packet_size).decode('utf-8')
+    message_size = client_socket.recv(4).decode('utf-8')
     message_size = int(message_size)
 
     response = client_socket.recv(message_size)
