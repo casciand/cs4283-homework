@@ -35,6 +35,7 @@ def driver(args):
     try:
         size = bytes(str(len(response)), 'utf-8')
         prev_socket.sendall(size)
+        time.sleep(0.1)
         prev_socket.sendall(response)
     except err:
         print(err)

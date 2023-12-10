@@ -77,6 +77,7 @@ def driver(args):
     try:
         size = bytes(str(len(message)), 'utf-8')
         client_socket.sendall(size)
+        time.sleep(0.1)
         client_socket.sendall(message)
     except err:
         print(err)

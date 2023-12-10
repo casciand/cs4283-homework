@@ -80,7 +80,9 @@ def driver(args):
 
     try:
         size = bytes(str(len(message)), 'utf-8')
+        print(size)
         next_socket.sendall(size)
+        time.sleep(0.1)
         next_socket.sendall(message)
     except err:
         print(err)
@@ -108,6 +110,7 @@ def driver(args):
     try:
         size = bytes(str(len(response)), 'utf-8')
         prev_socket.sendall(size)
+        time.sleep(0.1)
         prev_socket.sendall(response)
     except err:
         print(err)
