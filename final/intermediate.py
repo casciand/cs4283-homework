@@ -59,7 +59,19 @@ def driver(args):
     print(f'Connection established with {prev_address}')
 
     # Receive and decrypt single layer of encryption
-    ciphertext = prev_socket.recv(packet_size)
+    message_size = ''
+    curr = prev_socket.recv(1)
+    while curr != '\n':
+        message_size += curr
+        curr = prev_socket.recv(1)
+    message_size = int(message_size)
+
+    ciphertext = prev_socket.recv(message_size)
+    recv_length = len(ciphertext)
+    while message_size - recv_length > 0:
+        ciphertext += prev_socket.recv(message_size - recv_length)
+        recv_length = len(ciphertext)
+
     print('Received wrapped ciphertext:', ciphertext)
     f = Fernet(symmetric_key)
     message = f.decrypt(ciphertext)
