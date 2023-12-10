@@ -5,6 +5,8 @@ import time
 
 
 def driver(args):
+    packet_size = 4096
+
     # Establish connection with previous node
     print('Binding socket...')
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -16,7 +18,7 @@ def driver(args):
     print(f'Connection established with {prev_address}')
 
     # Receive and send response
-    message = prev_socket.recv(1024)
+    message = prev_socket.recv(packet_size)
     print('Received decrypted message:', message)
 
     response = b'SECRET RESPONSE'

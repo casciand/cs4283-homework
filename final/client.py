@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 def driver(args):
     symmetric_keys = []
     entry_node_addr = '10.0.0.2'
+    packet_size = 4096
 
     start_time_1 = time.time()
 
@@ -38,7 +39,7 @@ def driver(args):
         print('Sent RSA public key!')
 
         #  Receive Fernet (symmetric) key
-        encrypted_symmetric_key = client_socket.recv(1024)
+        encrypted_symmetric_key = client_socket.recv(packet_size)
         print('Received encrypted Fernet key:', encrypted_symmetric_key)
         symmetric_key = private_key.decrypt(
             encrypted_symmetric_key,
@@ -79,7 +80,7 @@ def driver(args):
     print('---------- Unwrapping the Onion ----------\n')
 
     # Receive wrapped response
-    response = client_socket.recv(1024)
+    response = client_socket.recv(packet_size)
     print('Received wrapped response:', response)
 
     # Unwrap the onion
@@ -90,8 +91,8 @@ def driver(args):
 
     # Calculate latencies
     end_time = time.time()
-    print('End-to-end latency (with key exchange):', end_time - start_time_1)
-    print('End-to-end latency (without key exchange):', end_time - start_time_2)
+    print(f'\nEnd-to-end latency (including key exchange): {end_time - start_time_1:.3f}')
+    print(f'End-to-end latency (NOT including key exchange): {end_time - start_time_2:.3f}')
 
     client_socket.close()
 

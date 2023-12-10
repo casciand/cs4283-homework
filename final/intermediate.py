@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
 def driver(args):
     next_node_addr = f'10.0.0.{int(args.addr[-1]) + 1}'
+    packet_size = 4096
 
     print('---------- Key Exchange ----------\n')
 
@@ -23,7 +24,7 @@ def driver(args):
     print(f'Connection established with {client_address}')
 
     # Receive client RSA public key
-    pem = client_socket.recv(1024)
+    pem = client_socket.recv(packet_size)
     print('Received RSA public key!')
     public_key = serialization.load_pem_public_key(pem)
 
@@ -58,7 +59,7 @@ def driver(args):
     print(f'Connection established with {prev_address}')
 
     # Receive and decrypt single layer of encryption
-    ciphertext = prev_socket.recv(1024)
+    ciphertext = prev_socket.recv(packet_size)
     print('Received wrapped ciphertext:', ciphertext)
     f = Fernet(symmetric_key)
     message = f.decrypt(ciphertext)
@@ -75,7 +76,7 @@ def driver(args):
     print('---------- Wrapping the Onion ----------\n')
 
     # Receive response form next node
-    response = next_socket.recv(1024)
+    response = next_socket.recv(packet_size)
     print('Received response:', response)
     response = f.encrypt(response)
     print('Added single layer of encryption:', response)
