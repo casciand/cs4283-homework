@@ -70,7 +70,7 @@ def driver(args):
 
     # Send wrapped message
     client_socket.sendall(message)
-    print(f'Sent wrapped message to {entry_node_addr} (with {args.hosts} layers of encryption!)')
+    print(f'Sent wrapped message to {entry_node_addr} (with {args.hosts} layers of encryption!)\n')
 
     # Receive wrapped response
     response = client_socket.recv(1024)

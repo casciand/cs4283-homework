@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
 
 def driver(args):
-    next_node_addr = f'10.0.0.{args.addr[-1] + 1}'
+    next_node_addr = f'10.0.0.{int(args.addr[-1]) + 1}'
 
     print('---------- Key Exchange ----------\n')
 
@@ -70,10 +70,9 @@ def driver(args):
     next_socket.connect((next_node_addr, int(args.port)))
 
     next_socket.sendall(message)
-    print(f'Forwarded message to next node at {next_node_addr}')
-    print()
+    print(f'Forwarded message to next node at {next_node_addr}\n')
 
-    print('---------- Unwrapping the Onion ----------\n')
+    print('---------- Wrapping the Onion ----------\n')
 
     # Receive response form next node
     response = next_socket.recv(1024)
