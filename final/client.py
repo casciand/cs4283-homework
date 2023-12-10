@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 def driver(args):
     symmetric_keys = []
     entry_node_addr = '10.0.0.2'
-    packet_size = 8192
+    packet_size = 16384
 
     start_time_1 = time.time()
 

@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
 def driver(args):
     next_node_addr = f'10.0.0.{int(args.addr[-1]) + 1}'
-    packet_size = 8192
+    packet_size = 16384
 
     print('---------- Key Exchange ----------\n')
 

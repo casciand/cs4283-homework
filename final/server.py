@@ -5,7 +5,7 @@ import time
 
 
 def driver(args):
-    packet_size = 8192
+    packet_size = 16384
 
     # Establish connection with previous node
     print('Binding socket...')
