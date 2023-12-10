@@ -12,6 +12,8 @@ def driver(args):
     symmetric_keys = []
     entry_node_addr = '10.0.0.2'
 
+    start_time_1 = time.time()
+
     for i in range(args.hosts):
         print(f'---------- Intermediate {i + 1} ----------\n')
 
@@ -58,6 +60,8 @@ def driver(args):
     message = b'SECRET MESSAGE'
     print('Plaintext:', message)
 
+    start_time_2 = time.time()
+
     for i, key in enumerate(reversed(symmetric_keys)):
         f = Fernet(key)
         message = f.encrypt(message)
@@ -72,6 +76,8 @@ def driver(args):
     client_socket.sendall(message)
     print(f'Sent wrapped message to {entry_node_addr} (with {args.hosts} layers of encryption!)\n')
 
+    print('---------- Unwrapping the Onion ----------\n')
+
     # Receive wrapped response
     response = client_socket.recv(1024)
     print('Received wrapped response:', response)
@@ -80,7 +86,12 @@ def driver(args):
     for i, key in enumerate(symmetric_keys):
         f = Fernet(key)
         response = f.decrypt(response)
-        print(f'Decrypted Response (Layer {i + 1}):', response)
+        print(f'Decrypted Response (Layer {len(symmetric_keys) - i}):', response)
+
+    # Calculate latencies
+    end_time = time.time()
+    print('End-to-end latency (with key exchange):', end_time - start_time_1)
+    print('End-to-end latency (without key exchange):', end_time - start_time_2)
 
     client_socket.close()
 

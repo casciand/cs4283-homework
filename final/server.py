@@ -25,7 +25,6 @@ def driver(args):
 
     server_socket.close()
     prev_socket.close()
-    next_socket.close()
 
 
 def parse_args():
